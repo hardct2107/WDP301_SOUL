@@ -1,0 +1,45 @@
+:root {
+  /* ── SOUL Design System Color Variables ── */
+
+  /* Primary — Purple */
+  --color-primary-600: #9B67CC;
+  --color-primary-500: #9C8BFE;
+  --color-primary-400: #A0A8F3;
+  --color-primary-300: #BB9DF7;
+  --color-primary-200: #CDB6FE;
+  --color-primary-100: #A5C0F7;
+
+  /* Neutral */
+  --color-neutral-50:  #FFFFFF;
+  --color-neutral-100: #C8CDEB;
+  --color-neutral-200: #878CB4;
+  --color-neutral-300: #475079;
+  --color-neutral-400: #1D233B;
+  --color-neutral-500: #0B0F1A;
+
+  /* Yellow / Accent */
+  --color-accent-100: #FFFFDB;
+  --color-accent-200: #FDEB97;
+  --color-accent-300: #F9D75C;
+  --color-accent-400: #F2AB7F;
+  --color-accent-500: #EF84B0;
+
+  /* Semantic Aliases */
+  --color-bg:           #F5F3FF;
+  --color-surface:      #FFFFFF;
+  --color-surface-alt:  #EEE8FF;
+  --color-border:       #C8CDEB;
+  --color-text-main:    #0B0F1A;
+  --color-text-strong:  #1D233B;
+  --color-text-muted:   #475079;
+  --color-text-light:   #878CB4;
+
+  /* Typography */
+  --font-display:
+    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    Segoe UI Symbol, Noto Color Emoji;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}

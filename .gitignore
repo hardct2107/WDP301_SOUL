@@ -1,0 +1,59 @@
+# ─── Node / npm ───────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# ─── Build output ─────────────────────────────────────────
+dist/
+build/
+*.js.map
+frontend/dist/
+frontend/build/
+backend/build/
+backend/target/
+
+# ─── Expo / React Native ──────────────────────────────────
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+android/
+ios/
+
+# ─── Java / Spring Boot / Gradle ─────────────────────────
+*.class
+*.jar
+*.war
+*.log
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+*.iml
+
+# ─── Env / Secrets (KHÔNG bao giờ commit) ────────────────
+.env
+.env.*
+*.env
+application-secret.yml
+backend/.env
+
+# ─── IDE ─────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ─── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── TypeScript ──────────────────────────────────────────
+*.tsbuildinfo
