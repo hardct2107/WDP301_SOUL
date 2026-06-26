@@ -12,6 +12,7 @@ import { CommunityPreview } from "@/components/home/CommunityPreview";
 import { EventCard } from "@/components/home/EventCard";
 import { BottomNav } from "@/components/home/BottomNav";
 import { Sidebar } from "@/components/home/Sidebar";
+import { RatingModal } from "@/components/home/RatingModal";
 
 export default function HomeScreen() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -42,6 +43,9 @@ export default function HomeScreen() {
 
         <BottomNav />
       </ScrollView>
+
+      {/* Rating popup — tự hiện sau 5 phút */}
+      <RatingModal />
     </View>
   );
 }
