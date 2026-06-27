@@ -1,4 +1,4 @@
-const AiAnalysis = require("../models/AIAnalysis");
+const AiAnalysis = require("../models/AiAnalysis");
 const UserEmotionProfile = require("../models/UserEmotionProfile");
 const User = require("../models/User");
 
