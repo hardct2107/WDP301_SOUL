@@ -31,21 +31,29 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8081",
   "http://localhost:19006",
+  "https://exe2306-lw7qjq3lt-soul11.vercel.app",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Cho phép Postman/mobile app không có origin
+      // Cho phép Postman / mobile app không có origin
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      const isAllowedOrigin =
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app");
+
+      if (isAllowedOrigin) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      console.log("CORS blocked origin:", origin);
+      return callback(new Error("Not allowed by CORS: " + origin));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
