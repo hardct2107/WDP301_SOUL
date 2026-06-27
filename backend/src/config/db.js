@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
+const dns = require("dns");
+
+// Fix lỗi DNS khi connect MongoDB Atlas bằng mongodb+srv
+dns.setDefaultResultOrder("ipv4first");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const connectDB = async () => {
   try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error("MONGODB_URI is missing");
-    }
-
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000,
+    });
 
     console.log("MongoDB Connected");
   } catch (error) {
