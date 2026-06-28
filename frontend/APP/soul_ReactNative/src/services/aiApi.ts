@@ -1,9 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@/api/config";
+// nếu path khác thì sửa lại, ví dụ "@/config/api"
 
-const API_ROOT =
-  process.env.EXPO_PUBLIC_API_URL || "http://localhost:5000";
-
-const API_BASE_URL = `${API_ROOT}/api/ai`;
+const AI_API_BASE_URL = `${API_BASE_URL.replace(/\/$/, "")}/ai`;
 
 async function getAuthHeaders() {
   const token = await AsyncStorage.getItem("token");
@@ -34,7 +33,7 @@ export type ChatMessage = {
 };
 
 export async function createChatSession() {
-  const res = await fetch(`${API_BASE_URL}/sessions`, {
+  const res = await fetch(`${AI_API_BASE_URL}/sessions`, {
     method: "POST",
     headers: await getAuthHeaders(),
   });
@@ -49,7 +48,7 @@ export async function createChatSession() {
 }
 
 export async function getChatSessions() {
-  const res = await fetch(`${API_BASE_URL}/sessions`, {
+  const res = await fetch(`${AI_API_BASE_URL}/sessions`, {
     method: "GET",
     headers: await getAuthHeaders(),
   });
@@ -64,7 +63,7 @@ export async function getChatSessions() {
 }
 
 export async function getChatMessages(sessionId: string) {
-  const res = await fetch(`${API_BASE_URL}/sessions/${sessionId}/messages`, {
+  const res = await fetch(`${AI_API_BASE_URL}/sessions/${sessionId}/messages`, {
     method: "GET",
     headers: await getAuthHeaders(),
   });
@@ -79,7 +78,7 @@ export async function getChatMessages(sessionId: string) {
 }
 
 export async function sendMessageToSession(sessionId: string, message: string) {
-  const res = await fetch(`${API_BASE_URL}/sessions/${sessionId}/messages`, {
+  const res = await fetch(`${AI_API_BASE_URL}/sessions/${sessionId}/messages`, {
     method: "POST",
     headers: await getAuthHeaders(),
     body: JSON.stringify({ message }),
@@ -95,7 +94,7 @@ export async function sendMessageToSession(sessionId: string, message: string) {
 }
 
 export async function deleteChatSession(sessionId: string) {
-  const res = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+  const res = await fetch(`${AI_API_BASE_URL}/sessions/${sessionId}`, {
     method: "DELETE",
     headers: await getAuthHeaders(),
   });
