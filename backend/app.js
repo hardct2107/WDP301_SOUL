@@ -9,6 +9,8 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./src/config/db");
 
 const emotionAnalysisRoutes = require("./src/routes/emotionAnalysisRoutes");
+const aiRoutes = require("./src/routes/aiRoutes");
+
 const authRouter = require("./src/routes/auth");
 const diaryRoutes = require("./src/routes/diaryRoutes");
 const postRoutes = require("./src/routes/postRoutes");
@@ -31,6 +33,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8081",
   "http://localhost:19006",
+  "https://exe2306.vercel.app",
+  "https://soulaimind.space",
   "https://exe2306-lw7qjq3lt-soul11.vercel.app",
 ].filter(Boolean);
 
@@ -41,8 +45,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       const isAllowedOrigin =
-        allowedOrigins.includes(origin) ||
-        origin.endsWith(".vercel.app");
+        allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
 
       if (isAllowedOrigin) {
         return callback(null, true);
@@ -83,6 +86,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Routes
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
@@ -92,6 +96,7 @@ app.use("/api/admin/forum", adminForumRoutes);
 app.use("/api/diaries", diaryRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/emotion-analysis", emotionAnalysisRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/emotional-tests", emotionalTestRoutes);

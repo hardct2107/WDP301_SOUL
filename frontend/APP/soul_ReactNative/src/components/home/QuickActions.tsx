@@ -11,7 +11,7 @@ const features = [
     title: "AI Companion",
     sub: "Emotion-aware chat",
     gradientColors: ["#7C3AED", "#6366F1"] as const,
-    route: null,
+    route: "/ai-chat",
   },
   {
     icon: "book-outline",
