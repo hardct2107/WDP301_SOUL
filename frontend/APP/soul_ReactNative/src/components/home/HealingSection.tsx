@@ -12,7 +12,7 @@ const healingFeatures = [
     icon: "robot-outline",
     gradient: ["#E0E7FF", "#C7D2FE"],
     iconColor: "#4F46E5",
-    route: "/(tabs)/forum", // Mock route
+    route: "/ai-chat",
   },
   {
     id: "diary",
