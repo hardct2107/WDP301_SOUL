@@ -1,9 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
 import { colors } from "@/constants/colors";
+import { RatingModal } from "@/components/home/RatingModal";
 
 const menuItems = [
   { icon: "home", label: "Home", route: "/" },
@@ -18,24 +20,22 @@ const menuItems = [
   { icon: "help-circle-outline", label: "Help & Support" },
 ];
 
+const isWeb = Platform.OS === "web";
+
 export function Sidebar() {
-  return (
-    <View style={styles.sidebar}>
-      {/* Logo with gradient */}
-      <View style={styles.logoBox}>
+  const [showRating, setShowRating] = useState(false);
+
+  const content = (
+    <>
+      {/* Logo */}
+      <View style={[styles.logoBox, { marginBottom: 20 }]}>
         <LinearGradient
           colors={["#7C3AED", "#6366F1", "#14B8A6"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: 20,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={{ width: 56, height: 56, borderRadius: 18, alignItems: "center", justifyContent: "center" }}
         >
-          <MaterialCommunityIcons name="leaf" size={36} color="#FFFFFF" />
+          <MaterialCommunityIcons name="leaf" size={30} color="#FFFFFF" />
         </LinearGradient>
         <Text style={styles.logoText}>SOUL</Text>
       </View>
@@ -50,38 +50,85 @@ export function Sidebar() {
         >
           <MaterialCommunityIcons
             name={item.icon as any}
-            size={22}
+            size={20}
             color={index === 0 ? colors.primary : colors.textSecondary}
           />
-
           <Text style={[styles.sideText, index === 0 && styles.sideTextActive]}>
             {item.label}
           </Text>
         </TouchableOpacity>
       ))}
 
-      {/* Reminder Card with gradient accent */}
+      {/* Nút Đánh giá */}
+      <TouchableOpacity
+        onPress={() => setShowRating(true)}
+        activeOpacity={0.78}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          marginTop: 4,
+          marginHorizontal: 4,
+          paddingVertical: 10,
+          paddingHorizontal: 14,
+          borderRadius: 14,
+          backgroundColor: "rgba(245, 158, 11, 0.10)",
+          borderWidth: 1.5,
+          borderColor: "rgba(245, 158, 11, 0.28)",
+        }}
+      >
+        <MaterialCommunityIcons name="star-outline" size={20} color="#F59E0B" />
+        <Text style={{ fontSize: 13, fontWeight: "600", color: "#F59E0B" }}>
+          Đánh giá ứng dụng
+        </Text>
+      </TouchableOpacity>
+
+      {/* Reminder Card */}
       <LinearGradient
         colors={["#EDE9FE", "#CCFBF1"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.reminderCard, { borderColor: colors.borderPrimary }]}
+        style={[styles.reminderCard, { borderColor: colors.borderPrimary, marginTop: 12 }]}
       >
         <LinearGradient
           colors={["#7C3AED", "#14B8A6"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{ width: 48, height: 48, borderRadius: 16, alignItems: "center", justifyContent: "center" }}
+          style={{ width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" }}
         >
-          <MaterialCommunityIcons name="sprout" size={28} color="#FFFFFF" />
+          <MaterialCommunityIcons name="sprout" size={24} color="#FFFFFF" />
         </LinearGradient>
-
         <Text style={styles.reminderTitle}>Daily reminder</Text>
-
         <Text style={styles.reminderText}>
           Take a deep breath. You are doing great.
         </Text>
       </LinearGradient>
+
+      {/* Rating Modal */}
+      <RatingModal
+        forceVisible={showRating}
+        onForceClose={() => setShowRating(false)}
+      />
+    </>
+  );
+
+  // Web: nằm trong cột flex, không cần position absolute
+  if (isWeb) {
+    return (
+      <ScrollView
+        style={{ flex: 1, paddingHorizontal: 16, paddingTop: 24 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 32, flexGrow: 1 }}
+      >
+        {content}
+      </ScrollView>
+    );
+  }
+
+  // Mobile: position absolute overlay
+  return (
+    <View style={styles.sidebar}>
+      {content}
     </View>
   );
 }

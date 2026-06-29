@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Modal,
   Platform,
@@ -11,6 +12,8 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ratingService } from "@/services/api";
+import { useAuthStore } from "@/store";
 
 // Hiện sau 5 phút (300,000ms) kể từ khi component mount
 const DELAY_MS = 5 * 60 * 1000;
@@ -25,25 +28,62 @@ const EMOJIS: Record<number, { icon: string; label: string; color: string }> = {
   5: { icon: "🤩", label: "Excellent!", color: "#7C3AED" },
 };
 
-export function RatingModal() {
+type Props = {
+  /** Khi true: mở modal ngay lập tức (dùng cho nút Rate ở BottomNav) */
+  forceVisible?: boolean;
+  onForceClose?: () => void;
+};
+
+export function RatingModal({ forceVisible = false, onForceClose }: Props) {
+  const { isLoggedIn } = useAuthStore();
   const [visible, setVisible] = useState(false);
   const [rating, setRating] = useState(0);
-  const [hoveredStar, setHoveredStar] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [alreadyRated, setAlreadyRated] = useState(false);
 
   // Animation values
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const starScale = useRef(STARS.map(() => new Animated.Value(1))).current;
 
-  // Mở modal sau 5 phút
+  // Kiểm tra đã đánh giá chưa (chỉ khi đã đăng nhập)
+  const checkAlreadyRated = async () => {
+    if (!isLoggedIn) return false;
+    try {
+      const res = await ratingService.getMyRating();
+      return res?.data?.hasRated === true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Mở modal sau 5 phút (auto timer) — chỉ hiện nếu chưa đánh giá
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(true);
+    const timer = setTimeout(async () => {
+      const rated = await checkAlreadyRated();
+      if (!rated) setVisible(true);
     }, DELAY_MS);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoggedIn]);
+
+  // Mở ngay khi forceVisible = true (nhấn nút Rate)
+  useEffect(() => {
+    if (forceVisible) {
+      setSubmitted(false);
+      setRating(0);
+      setFeedback("");
+      setApiError(null);
+      setAlreadyRated(false);
+      // Kiểm tra đã rate chưa rồi mới mở
+      checkAlreadyRated().then((rated) => {
+        setAlreadyRated(rated);
+        setVisible(true);
+      });
+    }
+  }, [forceVisible]);
 
   // Animation khi modal mở
   useEffect(() => {
@@ -90,14 +130,26 @@ export function RatingModal() {
     }
   };
 
-  const handleSubmit = () => {
-    if (rating === 0) return;
-    // Ở đây có thể gửi API nếu cần
-    console.log("Rating submitted:", { rating, feedback });
-    setSubmitted(true);
-    setTimeout(() => {
-      setVisible(false);
-    }, 2500);
+  const handleSubmit = async () => {
+    if (rating === 0 || isSubmitting) return;
+    setIsSubmitting(true);
+    setApiError(null);
+    try {
+      await ratingService.submit(rating, feedback);
+      setSubmitted(true);
+      setTimeout(() => {
+        setVisible(false);
+        onForceClose?.();
+      }, 2500);
+    } catch (err: any) {
+      if (err?.alreadyRated) {
+        setAlreadyRated(true);
+      } else {
+        setApiError(err?.message || "Có lỗi xảy ra, vui lòng thử lại.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -112,10 +164,13 @@ export function RatingModal() {
         duration: 200,
         useNativeDriver: true,
       }),
-    ]).start(() => setVisible(false));
+    ]).start(() => {
+      setVisible(false);
+      onForceClose?.(); // Báo lại HomeScreen reset forceVisible
+    });
   };
 
-  const activeMood = EMOJIS[hoveredStar || rating];
+  const activeMood = EMOJIS[rating];
 
   return (
     <Modal
@@ -152,7 +207,46 @@ export function RatingModal() {
               elevation: 20,
             }}
           >
-            {submitted ? (
+            {alreadyRated ? (
+              /* ── Đã đánh giá rồi ── */
+              <LinearGradient
+                colors={["#6366F1", "#7C3AED"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ padding: 48, alignItems: "center" }}
+              >
+                <TouchableOpacity
+                  onPress={handleClose}
+                  style={{
+                    position: "absolute", top: 16, right: 16,
+                    width: 34, height: 34, borderRadius: 17,
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  <MaterialCommunityIcons name="close" size={18} color="#FFFFFF" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 64, marginBottom: 16 }}>⭐</Text>
+                <Text
+                  style={{
+                    fontSize: 22, fontWeight: "800", color: "#FFFFFF",
+                    textAlign: "center", letterSpacing: 0.5,
+                    fontFamily: Platform.select({ web: "'Lexend','Inter',system-ui", default: undefined }),
+                  }}
+                >
+                  Bạn đã đánh giá rồi!
+                </Text>
+                <Text
+                  style={{
+                    marginTop: 10, fontSize: 14,
+                    color: "rgba(255,255,255,0.85)", textAlign: "center",
+                    fontFamily: Platform.select({ web: "'Inter',system-ui", default: undefined }),
+                  }}
+                >
+                  Mỗi tài khoản chỉ được đánh giá một lần.{"\n"}Cảm ơn bạn đã ủng hộ SOUL 💜
+                </Text>
+              </LinearGradient>
+            ) : submitted ? (
               /* ── Màn hình cảm ơn ── */
               <LinearGradient
                 colors={["#7C3AED", "#6366F1", "#14B8A6"]}
@@ -163,11 +257,8 @@ export function RatingModal() {
                 <Text style={{ fontSize: 64, marginBottom: 16 }}>🎉</Text>
                 <Text
                   style={{
-                    fontSize: 24,
-                    fontWeight: "800",
-                    color: "#FFFFFF",
-                    textAlign: "center",
-                    letterSpacing: 0.5,
+                    fontSize: 24, fontWeight: "800", color: "#FFFFFF",
+                    textAlign: "center", letterSpacing: 0.5,
                     fontFamily: Platform.select({ web: "'Lexend','Inter',system-ui", default: undefined }),
                   }}
                 >
@@ -175,10 +266,8 @@ export function RatingModal() {
                 </Text>
                 <Text
                   style={{
-                    marginTop: 10,
-                    fontSize: 15,
-                    color: "rgba(255,255,255,0.85)",
-                    textAlign: "center",
+                    marginTop: 10, fontSize: 15,
+                    color: "rgba(255,255,255,0.85)", textAlign: "center",
                     fontFamily: Platform.select({ web: "'Inter',system-ui", default: undefined }),
                   }}
                 >
@@ -261,7 +350,7 @@ export function RatingModal() {
                 {/* Body */}
                 <View style={{ padding: 28, paddingTop: 24 }}>
                   {/* Mood emoji indicator */}
-                  {(hoveredStar > 0 || rating > 0) && activeMood && (
+                  {rating > 0 && activeMood && (
                     <Animated.View
                       style={{
                         alignItems: "center",
@@ -293,26 +382,34 @@ export function RatingModal() {
                     }}
                   >
                     {STARS.map((star) => {
-                      const filled = star <= (hoveredStar || rating);
+                      const filled = star <= rating;
                       return (
-                        <Animated.View
+                        <Pressable
                           key={star}
-                          style={{ transform: [{ scale: starScale[star - 1] }] }}
+                          onPress={() => handleStarPress(star)}
+                          style={{ padding: 4 }}
                         >
-                          <TouchableOpacity
-                            onPress={() => handleStarPress(star)}
-                            onPressIn={() => setHoveredStar(star)}
-                            onPressOut={() => setHoveredStar(0)}
-                            activeOpacity={0.8}
-                            style={{ padding: 4 }}
-                          >
-                            <MaterialCommunityIcons
-                              name={filled ? "star" : "star-outline"}
-                              size={44}
-                              color={filled ? "#F59E0B" : "#CBD5E1"}
-                            />
-                          </TouchableOpacity>
-                        </Animated.View>
+                          {({ pressed }) => (
+                            <Animated.View
+                              style={{
+                                transform: [{ scale: starScale[star - 1] }],
+                                opacity: pressed ? 0.7 : 1,
+                              }}
+                            >
+                              <MaterialCommunityIcons
+                                name={filled || (pressed && star > rating) ? "star" : "star-outline"}
+                                size={44}
+                                color={
+                                  filled
+                                    ? "#F59E0B"
+                                    : pressed
+                                    ? "#FCD34D"
+                                    : "#CBD5E1"
+                                }
+                              />
+                            </Animated.View>
+                          )}
+                        </Pressable>
                       );
                     })}
                   </View>
@@ -358,11 +455,26 @@ export function RatingModal() {
                     </Text>
                   </View>
 
+                  {/* Thông báo lỗi API */}
+                  {apiError && (
+                    <View
+                      style={{
+                        backgroundColor: "#FEF2F2", borderRadius: 12,
+                        padding: 12, marginBottom: 14,
+                        borderWidth: 1, borderColor: "#FECACA",
+                        flexDirection: "row", alignItems: "center", gap: 8,
+                      }}
+                    >
+                      <MaterialCommunityIcons name="alert-circle-outline" size={18} color="#EF4444" />
+                      <Text style={{ fontSize: 13, color: "#DC2626", flex: 1 }}>{apiError}</Text>
+                    </View>
+                  )}
+
                   {/* Submit button */}
                   <TouchableOpacity
                     onPress={handleSubmit}
-                    disabled={rating === 0}
-                    style={{ borderRadius: 18, overflow: "hidden", opacity: rating === 0 ? 0.45 : 1 }}
+                    disabled={rating === 0 || isSubmitting}
+                    style={{ borderRadius: 18, overflow: "hidden", opacity: (rating === 0 || isSubmitting) ? 0.55 : 1 }}
                     activeOpacity={0.85}
                   >
                     <LinearGradient
@@ -377,17 +489,19 @@ export function RatingModal() {
                         gap: 8,
                       }}
                     >
-                      <MaterialCommunityIcons name="send-outline" size={20} color="#FFFFFF" />
+                      {isSubmitting ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <MaterialCommunityIcons name="send-outline" size={20} color="#FFFFFF" />
+                      )}
                       <Text
                         style={{
-                          fontSize: 16,
-                          fontWeight: "700",
-                          color: "#FFFFFF",
+                          fontSize: 16, fontWeight: "700", color: "#FFFFFF",
                           letterSpacing: 0.3,
                           fontFamily: Platform.select({ web: "'Lexend','Inter',system-ui", default: undefined }),
                         }}
                       >
-                        Submit Review
+                        {isSubmitting ? "Đang gửi..." : "Submit Review"}
                       </Text>
                     </LinearGradient>
                   </TouchableOpacity>

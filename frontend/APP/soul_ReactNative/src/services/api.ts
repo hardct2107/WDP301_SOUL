@@ -150,4 +150,29 @@ export const authService = {
   },
 };
 
+/**
+ * Các hàm API phục vụ đánh giá ứng dụng.
+ */
+export const ratingService = {
+  // Gửi đánh giá (mỗi tài khoản 1 lần)
+  submit: async (rating: number, feedback?: string) => {
+    try {
+      const response = await apiClient.post("/ratings", { rating, feedback: feedback || null });
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || new Error("Không thể kết nối đến máy chủ.");
+    }
+  },
+
+  // Kiểm tra tài khoản hiện tại đã đánh giá chưa
+  getMyRating: async () => {
+    try {
+      const response = await apiClient.get("/ratings/me");
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || new Error("Không thể kết nối đến máy chủ.");
+    }
+  },
+};
+
 export default apiClient;

@@ -21,6 +21,7 @@ const tagRoutes = require("./src/routes/tagRoutes");
 const adminRoutes = require("./src/routes/adminRoutes");
 const app = express();
 const emotionalTestRoutes = require("./src/routes/emotionalTestRoutes");
+const ratingRoutes = require("./src/routes/ratingRoutes");
 
 connectDB();
 
@@ -44,6 +45,8 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/emotion-analysis", emotionAnalysisRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/emotional-tests", emotionalTestRoutes);
+app.use("/api/ratings", ratingRoutes);
+
 
 app.get("/", (req, res) => {
   res.status(200).json({

@@ -126,7 +126,7 @@ export const forumStyles = StyleSheet.create({
     fontSize: 15,
     fontFamily: webFont,
     // @ts-ignore
-    outlineStyle: "none",
+    // outlineStyle: "none",
   },
 
   // ── Filter Chips ──────────────────────────────────────────────────────────
@@ -980,5 +980,80 @@ export const forumStyles = StyleSheet.create({
   reportSelectedText: {
     color: colors.primary,
     fontWeight: "700",
+  },
+
+  reportBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    justifyContent: "flex-end",
+  },
+  
+  reportIconCircle: {
+    alignSelf: "center",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#E6F4F1",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  
+  reportSub: {
+    textAlign: "center",
+    marginTop: 8,
+    color: colors.textSecondary,
+    fontSize: 14,
+    lineHeight: 21,
+    fontFamily: webFont,
+  },
+  
+  reasonList: {
+    marginTop: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  
+  reasonChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  
+  reasonChipActive: {
+    backgroundColor: "#00866B",
+    borderColor: "#00866B",
+  },
+  
+  reasonText: {
+    fontSize: 14,
+    color: "#064D3D",
+    fontWeight: "600",
+    fontFamily: webFont,
+  },
+  
+  reasonTextActive: {
+    color: "#FFFFFF",
+  },
+  
+  reportInput: {
+    marginTop: 20,
+    minHeight: 100,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    padding: 14,
+    fontSize: 15,
+    color: colors.textPrimary,
+    fontFamily: webFont,
+    textAlignVertical: "top",
   },
 });
