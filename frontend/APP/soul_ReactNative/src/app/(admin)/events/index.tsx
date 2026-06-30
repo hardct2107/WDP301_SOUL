@@ -91,6 +91,13 @@ export default function AdminEventsList() {
           <Text style={styles.eventInfoText}>{item.location || "Chưa xác định"}</Text>
         </View>
 
+        <View style={styles.eventInfoRow}>
+          <MaterialCommunityIcons name="star" size={16} color="#F59E0B" />
+          <Text style={styles.eventInfoText}>
+            {(item.ratingSummary?.average || 0).toFixed(1)} ({item.ratingSummary?.total || 0} đánh giá)
+          </Text>
+        </View>
+
         <View style={styles.eventStatsGrid}>
           <View style={styles.eventStatBox}>
             <Text style={styles.eventStatValue}>{registeredCount}</Text>

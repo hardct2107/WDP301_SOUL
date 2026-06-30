@@ -9,6 +9,10 @@ const {
 } = require("../controllers/adminController");
 
 const auth = require("../middleware/auth");
+const {
+  getEventDashboardStatistics,
+  updateParticipantAttendance,
+} = require("../controllers/eventController");
 
 // Lấy danh sách tất cả user (có filter, search, phân trang)
 router.get("/users", auth, auth.isAdmin, getAllUsers);
@@ -21,5 +25,13 @@ router.patch("/users/:id/status", auth, auth.isAdmin, updateUserStatus);
 
 // Cập nhật vai trò (gán/thu hồi event_organizer, admin)
 router.patch("/users/:id/role", auth, auth.isAdmin, updateUserRole);
+
+router.patch(
+  "/events/:eventId/participants/:userId/attendance",
+  auth,
+  auth.isAdmin,
+  updateParticipantAttendance
+);
+router.get("/events/statistics", auth, auth.isAdmin, getEventDashboardStatistics);
 
 module.exports = router;

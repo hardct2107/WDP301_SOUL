@@ -3,6 +3,7 @@ const router = express.Router();
 const eventController = require("../controllers/eventController");
 const auth = require("../middleware/auth");
 const adminOnly = require("../middleware/adminOnly");
+const ratingController = require("../controllers/eventRatingController");
 
 // Public routes
 router.get("/", eventController.getEvents);
@@ -17,6 +18,11 @@ router.get("/:id/registrations", auth, adminOnly, eventController.getEventRegist
 router.get("/me/registered", auth, eventController.getRegisteredEvents);
 router.post("/:id/register", auth, eventController.registerEvent);
 router.post("/:id/cancel", auth, eventController.cancelRegistration);
+
+router.post("/:eventId/ratings", auth, ratingController.submitRating);
+router.patch("/:eventId/my-rating", auth, ratingController.updateMyRating);
+router.get("/:eventId/ratings", ratingController.getEventRatings);
+router.get("/:eventId/rating-summary", ratingController.getEventRatingSummary);
 
 router.get("/:id", eventController.getEventById);
 

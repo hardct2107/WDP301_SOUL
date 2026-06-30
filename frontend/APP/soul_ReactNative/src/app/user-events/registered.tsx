@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,16 +14,19 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { colors } from "@/constants/colors";
 import { eventUserService } from "@/services/eventApi";
+import { RatingSummary } from "@/api/ratingApi";
 import {
+  attendanceMeta,
   eventStatusMeta,
   EventRegistration,
   EventStatus,
   getComputedEventStatus,
+  normalizeEventRegistration,
   registrationMeta,
-  RegistrationStatus,
+  reviewMeta,
 } from "@/utils/eventRegistration";
 
-type RegistrationFilter = "all" | RegistrationStatus;
+type RegistrationFilter = "all" | "registered" | "cancelled" | "attended" | "absent";
 
 type RegisteredEvent = {
   _id: string;
@@ -36,12 +39,15 @@ type RegisteredEvent = {
   registeredCount?: number;
   status: EventStatus;
   registration?: EventRegistration;
+  ratingSummary?: RatingSummary;
 };
 
 const filters: { label: string; value: RegistrationFilter }[] = [
-  { label: "All", value: "all" },
-  { label: "Registered", value: "registered" },
-  { label: "Cancelled", value: "cancelled" },
+  { label: "Tất cả", value: "all" },
+  { label: "Đã đăng ký", value: "registered" },
+  { label: "Đã hủy", value: "cancelled" },
+  { label: "Đã tham dự", value: "attended" },
+  { label: "Vắng mặt", value: "absent" },
 ];
 
 const formatDateTime = (value?: string | null) => {
@@ -60,15 +66,24 @@ export default function RegisteredEventsScreen() {
   const [events, setEvents] = useState<RegisteredEvent[]>([]);
   const [filter, setFilter] = useState<RegistrationFilter>("all");
   const [searchText, setSearchText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   const loadRegisteredEvents = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await eventUserService.getRegisteredEvents("all", 1, 100);
+      const response = await eventUserService.getRegisteredEvents(
+        "all",
+        1,
+        100,
+        searchQuery
+      );
 
       if (response.success) {
-        setEvents(response.data || []);
+        setEvents((response.data || []).map((item: RegisteredEvent) => ({
+          ...item,
+          registration: normalizeEventRegistration(item.registration) || undefined,
+        })));
       }
     } catch (error: any) {
       Alert.alert(
@@ -78,7 +93,12 @@ export default function RegisteredEventsScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchText.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   useFocusEffect(
     useCallback(() => {
@@ -88,16 +108,24 @@ export default function RegisteredEventsScreen() {
 
   const counts = useMemo(() => {
     const registered = events.filter(
-      (event) => event.registration?.status === "registered"
+      (event) => event.registration?.registrationStatus === "registered"
     ).length;
     const cancelled = events.filter(
-      (event) => event.registration?.status === "cancelled"
+      (event) => event.registration?.registrationStatus === "cancelled"
+    ).length;
+    const attended = events.filter(
+      (event) => event.registration?.attendanceStatus === "attended"
+    ).length;
+    const absent = events.filter(
+      (event) => event.registration?.attendanceStatus === "absent"
     ).length;
 
     return {
       all: events.length,
       registered,
       cancelled,
+      attended,
+      absent,
     };
   }, [events]);
 
@@ -105,7 +133,8 @@ export default function RegisteredEventsScreen() {
     const keyword = searchText.trim().toLowerCase();
 
     return events.filter((event) => {
-      const registrationStatus = event.registration?.status;
+      const registrationStatus = event.registration?.registrationStatus;
+      const attendanceStatus = event.registration?.attendanceStatus;
       const searchableText = [
         event.title,
         event.description,
@@ -118,15 +147,17 @@ export default function RegisteredEventsScreen() {
         .toLowerCase();
 
       return (
-        (filter === "all" || registrationStatus === filter) &&
+        (filter === "all" || registrationStatus === filter || attendanceStatus === filter) &&
         (!keyword || searchableText.includes(keyword))
       );
     });
   }, [events, filter, searchText]);
 
   const renderEvent = ({ item }: { item: RegisteredEvent }) => {
-    const registrationStatus = item.registration?.status || "registered";
+    const registrationStatus = item.registration?.registrationStatus || "registered";
     const registration = registrationMeta[registrationStatus];
+    const attendance = attendanceMeta[item.registration?.attendanceStatus || "not_checked_in"];
+    const review = reviewMeta[item.registration?.reviewStatus || "not_reviewed"];
     const eventStatus =
       eventStatusMeta[getComputedEventStatus(item)] || eventStatusMeta.upcoming;
 
@@ -180,6 +211,24 @@ export default function RegisteredEventsScreen() {
             text={item.location || item.meetingLink || "Location not updated"}
           />
         </View>
+
+        <View style={screenStyles.ratingRow}>
+          <MaterialCommunityIcons name="star" size={17} color="#F59E0B" />
+          <Text style={screenStyles.ratingValue}>
+            {(item.ratingSummary?.average || 0).toFixed(1)}
+          </Text>
+          <Text style={screenStyles.ratingCount}>
+            ({item.ratingSummary?.total || 0} đánh giá)
+          </Text>
+        </View>
+        <View style={screenStyles.stateRow}>
+          <View style={[screenStyles.stateBadge, { backgroundColor: attendance.bg }]}>
+            <Text style={[screenStyles.stateBadgeText, { color: attendance.color }]}>Tham dự: {attendance.label}</Text>
+          </View>
+          <View style={[screenStyles.stateBadge, { backgroundColor: review.bg }]}>
+            <Text style={[screenStyles.stateBadgeText, { color: review.color }]}>Đánh giá: {review.label}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -192,9 +241,9 @@ export default function RegisteredEventsScreen() {
         </TouchableOpacity>
 
         <View style={screenStyles.headerTextWrap}>
-          <Text style={screenStyles.headerTitle}>Registered Events</Text>
+          <Text style={screenStyles.headerTitle}>Sự kiện của tôi</Text>
           <Text style={screenStyles.headerSubtitle}>
-            Track your event participation status
+            Theo dõi đăng ký, tham dự và đánh giá
           </Text>
         </View>
       </View>
@@ -210,11 +259,11 @@ export default function RegisteredEventsScreen() {
         ListHeaderComponent={
           <View>
             <View style={screenStyles.summaryCard}>
-              <SummaryItem label="Total Events" value={counts.all} />
+              <SummaryItem label="Tổng sự kiện" value={counts.all} />
               <View style={screenStyles.summaryDivider} />
-              <SummaryItem label="Registered" value={counts.registered} />
+              <SummaryItem label="Đã đăng ký" value={counts.registered} />
               <View style={screenStyles.summaryDivider} />
-              <SummaryItem label="Cancelled" value={counts.cancelled} />
+              <SummaryItem label="Đã hủy" value={counts.cancelled} />
             </View>
 
             <View style={screenStyles.searchBox}>
@@ -313,6 +362,12 @@ function InfoRow({
 }
 
 const screenStyles = StyleSheet.create({
+  ratingRow: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 10 },
+  ratingValue: { color: "#92400E", fontWeight: "800" },
+  ratingCount: { color: "#64748B", fontSize: 12 },
+  stateRow: { flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 10 },
+  stateBadge: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 5 },
+  stateBadgeText: { fontSize: 10, fontWeight: "800" },
   safeArea: {
     flex: 1,
     backgroundColor: colors.bg,

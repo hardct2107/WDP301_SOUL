@@ -1,30 +1,5 @@
 const mongoose = require("mongoose");
 
-const participantSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: ["registered", "cancelled", "attended"],
-      required: true,
-      default: "registered",
-    },
-    registeredAt: {
-      type: Date,
-      default: Date.now,
-    },
-    cancelledAt: {
-      type: Date,
-      default: null,
-    },
-  },
-  { _id: false }
-);
-
 const eventSchema = new mongoose.Schema(
   {
     title: {
@@ -95,7 +70,6 @@ const eventSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    participants: [participantSchema],
     status: {
       type: String,
       enum: ["upcoming", "ongoing", "completed", "cancelled"],
@@ -116,7 +90,6 @@ const eventSchema = new mongoose.Schema(
 eventSchema.index({ status: 1 });
 eventSchema.index({ startDateTime: 1 });
 eventSchema.index({ createdBy: 1 });
-eventSchema.index({ "participants.userId": 1 });
 
 const Event = mongoose.model("Event", eventSchema);
 
