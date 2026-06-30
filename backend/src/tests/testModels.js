@@ -17,6 +17,7 @@ const Tag = require("../models/Tag");
 const Report = require("../models/Report");
 const Notification = require("../models/Notification");
 const ModerationLog = require("../models/ModerationLog");
+const EventRating = require("../models/EventRating");
 
 const runTest = async () => {
   try {
@@ -87,6 +88,10 @@ const runTest = async () => {
     // 14. Verify ModerationLog Model
     const moderationLogsCount = await ModerationLog.countDocuments();
     console.log(`[PASS] ModerationLog Model - Found ${moderationLogsCount} moderation logs.`);
+
+    // 15. Verify Event Rating Model
+    const eventRatingsCount = await EventRating.countDocuments();
+    console.log(`[PASS] EventRating Model - Found ${eventRatingsCount} event ratings.`);
 
     console.log("\n>>> ALL MONGOOSE MODELS HAVE COMPLETED VERIFICATION SUCCESSFULLY! <<<");
     process.exit(0);

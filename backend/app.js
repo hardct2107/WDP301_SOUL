@@ -22,6 +22,8 @@ const eventRoutes = require("./src/routes/eventRoutes");
 const tagRoutes = require("./src/routes/tagRoutes");
 const adminRoutes = require("./src/routes/adminRoutes");
 const emotionalTestRoutes = require("./src/routes/emotionalTestRoutes");
+const ratingRoutes = require("./src/routes/ratingRoutes");
+const adminRatingRoutes = require("./src/routes/adminRatingRoutes");
 
 const app = express();
 
@@ -100,5 +102,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/emotion-analysis", emotionAnalysisRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/emotional-tests", emotionalTestRoutes);
+app.use("/api/ratings", ratingRoutes);
+app.use("/api/admin/ratings", adminRatingRoutes);
 
 module.exports = app;

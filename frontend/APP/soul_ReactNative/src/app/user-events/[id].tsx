@@ -1,20 +1,28 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Platform,
   SafeAreaView,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { colors } from "@/constants/colors";
 import { eventUserService } from "@/services/eventApi";
+import { RatingSummary } from "@/api/ratingApi";
 import {
+  EventRatingSection,
+  EventRatingSectionHandle,
+} from "@/components/ratings/EventRatingSection";
+import {
+  attendanceMeta,
   eventStatusMeta,
   EventRegistration,
   EventStatus,
@@ -22,8 +30,10 @@ import {
   getFillRate,
   getRemainingSlots,
   isEventFull,
+  normalizeEventRegistration,
   registrationMeta,
   RegistrationStatus,
+  reviewMeta,
 } from "@/utils/eventRegistration";
 
 type CommunityEvent = {
@@ -41,6 +51,7 @@ type CommunityEvent = {
   capacity?: number | null;
   registeredCount?: number;
   status: EventStatus;
+  ratingSummary?: RatingSummary;
 };
 
 type RegisteredEvent = CommunityEvent & {
@@ -71,15 +82,24 @@ const formatDateTime = (value?: string | null) => {
   });
 };
 
+const formatDate = (value?: string | null) => {
+  if (!value) return "Chưa cập nhật";
+  return new Date(value).toLocaleDateString("vi-VN");
+};
+
 export default function UserEventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { width } = useWindowDimensions();
+  const desktop = width >= 960;
   const [event, setEvent] = useState<CommunityEvent | null>(null);
+  const [relatedEvents, setRelatedEvents] = useState<CommunityEvent[]>([]);
   const [registration, setRegistration] = useState<EventRegistration | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<ToastState>(null);
   const optimisticRegistrationRef = useRef<EventRegistration | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ratingSectionRef = useRef<EventRatingSectionHandle>(null);
 
   const showToast = useCallback((message: string, type: "success" | "error") => {
     if (toastTimerRef.current) {
@@ -128,10 +148,13 @@ export default function UserEventDetailScreen() {
           const matched = (registeredResponse.value.data || []).find(
             (item: RegisteredEvent) => item._id === id
           );
-          const matchedRegistration = matched?.registration || null;
+          const matchedRegistration = normalizeEventRegistration(matched?.registration);
 
           if (!showLoader && optimisticRegistrationRef.current) {
-            if (matchedRegistration?.status === optimisticRegistrationRef.current.status) {
+            if (
+              matchedRegistration?.registrationStatus ===
+              optimisticRegistrationRef.current.registrationStatus
+            ) {
               optimisticRegistrationRef.current = null;
               setRegistration(matchedRegistration);
             }
@@ -158,6 +181,27 @@ export default function UserEventDetailScreen() {
     }, [loadEvent])
   );
 
+  useEffect(() => {
+    if (!event?._id) return;
+
+    let active = true;
+    eventUserService
+      .getEvents({ eventType: event.eventType || undefined, status: "all", page: 1, limit: 4 })
+      .then((response) => {
+        if (!active) return;
+        setRelatedEvents(
+          (response.data || []).filter((item: CommunityEvent) => item._id !== event._id).slice(0, 3)
+        );
+      })
+      .catch(() => {
+        if (active) setRelatedEvents([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [event?._id, event?.eventType]);
+
   const registeredCount = event?.registeredCount || 0;
   const remainingSlots = getRemainingSlots(event?.capacity, registeredCount);
   const computedStatus = event ? getComputedEventStatus(event) : "upcoming";
@@ -165,8 +209,14 @@ export default function UserEventDetailScreen() {
   const fillRate = getFillRate(event?.capacity, registeredCount);
   const full = isEventFull(event?.capacity, registeredCount);
   const registrationClosed = computedStatus === "completed" || computedStatus === "cancelled";
-  const registrationStatus = registration?.status
-    ? registrationMeta[registration.status]
+  const registrationStatus = registration?.registrationStatus
+    ? registrationMeta[registration.registrationStatus]
+    : null;
+  const attendanceStatus = registration?.attendanceStatus
+    ? attendanceMeta[registration.attendanceStatus]
+    : null;
+  const reviewStatus = registration?.reviewStatus
+    ? reviewMeta[registration.reviewStatus]
     : null;
 
   const participantCountText = useMemo(() => {
@@ -179,18 +229,14 @@ export default function UserEventDetailScreen() {
     return `${registeredCount}/${event.capacity} registered participants`;
   }, [event, registeredCount]);
 
-  const remainingSlotsText =
-    remainingSlots === null ? "Unlimited" : `${remainingSlots} remaining slots`;
-
   const canRegister =
     computedStatus === "upcoming" &&
-    registration?.status !== "registered" &&
+    registration?.registrationStatus !== "registered" &&
     !full &&
     !registrationClosed;
   const canCancel =
-    registration?.status === "registered" &&
-    computedStatus !== "completed" &&
-    computedStatus !== "cancelled";
+    registration?.registrationStatus === "registered" &&
+    computedStatus === "upcoming";
 
   const applyRegistrationState = (
     nextStatus: RegistrationStatus,
@@ -198,7 +244,9 @@ export default function UserEventDetailScreen() {
   ) => {
     const now = new Date().toISOString();
     const nextRegistration: EventRegistration = {
-      status: nextStatus,
+      registrationStatus: nextStatus,
+      attendanceStatus: "not_checked_in",
+      reviewStatus: registration?.reviewStatus || "not_reviewed",
       registeredAt:
         nextStatus === "registered" ? now : registration?.registeredAt || now,
       cancelledAt: nextStatus === "cancelled" ? now : null,
@@ -285,6 +333,18 @@ export default function UserEventDetailScreen() {
         },
       ]
     );
+  };
+
+  const handleShare = async () => {
+    if (!event) return;
+
+    const message = `${event.title}\n${formatDateTime(event.startDateTime)}\n${event.location || event.meetingLink || "SOUL Event"}`;
+
+    try {
+      await Share.share({ title: event.title, message });
+    } catch {
+      showToast("Không thể mở chức năng chia sẻ lúc này.", "error");
+    }
   };
 
   if (loading) {
@@ -376,6 +436,20 @@ export default function UserEventDetailScreen() {
                 </Text>
               </View>
             )}
+            {attendanceStatus && (
+              <View style={[screenStyles.statusPill, { backgroundColor: attendanceStatus.bg }]}>
+                <Text style={[screenStyles.statusText, { color: attendanceStatus.color }]}>
+                  {attendanceStatus.label}
+                </Text>
+              </View>
+            )}
+            {reviewStatus && (
+              <View style={[screenStyles.statusPill, { backgroundColor: reviewStatus.bg }]}>
+                <Text style={[screenStyles.statusText, { color: reviewStatus.color }]}>
+                  {reviewStatus.label}
+                </Text>
+              </View>
+            )}
           </View>
 
           <Text style={screenStyles.eventTitle}>{event.title}</Text>
@@ -414,51 +488,106 @@ export default function UserEventDetailScreen() {
           </Text>
         </View>
 
-        <View style={screenStyles.infoCard}>
-          <InfoRow icon="clock-outline" label="Start" value={formatDateTime(event.startDateTime)} />
-          <InfoRow icon="calendar-end-outline" label="End" value={formatDateTime(event.endDateTime)} />
-          <InfoRow
-            icon="map-marker-outline"
-            label="Location"
-            value={event.location || event.meetingLink || "Not updated"}
-          />
-          <InfoRow
-            icon="account-tie-outline"
-            label="Speaker"
-            value={event.speakerName || event.organizerName || "SOUL Community"}
-          />
-          <InfoRow icon="account-group-outline" label="Registered" value={participantCountText} />
-          <InfoRow icon="seat-outline" label="Capacity" value={event.capacity ? `${event.capacity}` : "Unlimited"} />
-          <InfoRow icon="seat-outline" label="Remaining Slots" value={remainingSlotsText} />
-          <InfoRow
-            icon="email-outline"
-            label="Contact"
-            value={event.contactEmail || "Not updated"}
-          />
-        </View>
+        <View style={[screenStyles.detailLayout, desktop && screenStyles.detailLayoutDesktop]}>
+          <View style={screenStyles.mainColumn}>
+            <View style={screenStyles.infoCard}>
+              <Text style={screenStyles.sectionEyebrow}>THÔNG TIN SỰ KIỆN</Text>
+              <View style={screenStyles.infoGrid}>
+                <InfoCell icon="clock-outline" label="Bắt đầu" value={formatDateTime(event.startDateTime)} desktop={desktop} />
+                <InfoCell icon="calendar-end-outline" label="Kết thúc" value={formatDateTime(event.endDateTime)} desktop={desktop} />
+                <InfoCell icon="map-marker-outline" label="Địa điểm" value={event.location || event.meetingLink || "Chưa cập nhật"} desktop={desktop} />
+                <InfoCell icon="account-tie-outline" label="Diễn giả" value={event.speakerName || event.organizerName || "SOUL Community"} desktop={desktop} />
+                <InfoCell icon="email-outline" label="Liên hệ" value={event.contactEmail || "Chưa cập nhật"} desktop={desktop} />
+                <InfoCell icon="account-group-outline" label="Đã đăng ký" value={participantCountText} desktop={desktop} />
+              </View>
+            </View>
 
-        {registration && (
-          <View style={screenStyles.registrationCard}>
-            <Text style={screenStyles.sectionTitle}>Registration Information</Text>
-            <InfoRow
-              icon="bookmark-check-outline"
-              label="Status"
-              value={registrationMeta[registration.status].label}
+            <EventRatingSection
+              ref={ratingSectionRef}
+              eventId={event._id}
+              eventTitle={event.title}
+              completed={computedStatus === "completed"}
+              registrationStatus={registration?.registrationStatus}
+              attendanceStatus={registration?.attendanceStatus}
+              initialSummary={event.ratingSummary}
+              hideActionCard
             />
-            <InfoRow
-              icon="calendar-check-outline"
-              label="Registered At"
-              value={formatDateTime(registration.registeredAt)}
-            />
-            {registration.status === "cancelled" && (
-              <InfoRow
-                icon="calendar-remove-outline"
-                label="Cancelled At"
-                value={formatDateTime(registration.cancelledAt)}
-              />
-            )}
           </View>
-        )}
+
+          <View style={[screenStyles.sidebar, desktop && screenStyles.sidebarDesktop]}>
+            <View style={screenStyles.sidebarCard}>
+              <Text style={screenStyles.sectionEyebrow}>THÔNG TIN ĐĂNG KÝ</Text>
+              <InfoRow
+                icon="bookmark-check-outline"
+                label="Đăng ký"
+                value={registrationStatus?.label || "Chưa đăng ký"}
+              />
+              <InfoRow
+                icon="account-check-outline"
+                label="Tham dự"
+                value={attendanceStatus?.label || "Not checked in"}
+              />
+              <InfoRow
+                icon="message-star-outline"
+                label="Đánh giá"
+                value={reviewStatus?.label || "Not reviewed"}
+              />
+              {registration?.registeredAt && (
+                <InfoRow
+                  icon="calendar-check-outline"
+                  label="Đăng ký lúc"
+                  value={formatDateTime(registration.registeredAt)}
+                />
+              )}
+              {registration?.attendanceStatus === "attended" && (
+                <View style={screenStyles.attendedNotice}>
+                  <MaterialCommunityIcons name="check-decagram" size={18} color="#047857" />
+                  <Text style={screenStyles.attendedNoticeText}>Bạn đã tham dự và có thể gửi đánh giá.</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={screenStyles.sidebarCard}>
+              <TouchableOpacity
+                style={[
+                  screenStyles.ratingButton,
+                  !(computedStatus === "completed" && registration?.attendanceStatus === "attended") && screenStyles.outlineButtonDisabled,
+                ]}
+                onPress={() => ratingSectionRef.current?.openModal()}
+                disabled={!(computedStatus === "completed" && registration?.attendanceStatus === "attended")}
+              >
+                <MaterialCommunityIcons name="star-outline" size={19} color={colors.primary} />
+                <Text style={screenStyles.ratingButtonText}>Đánh giá sự kiện</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={screenStyles.shareButton} onPress={handleShare}>
+                <MaterialCommunityIcons name="share-variant-outline" size={18} color="#475569" />
+                <Text style={screenStyles.shareButtonText}>Chia sẻ sự kiện</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={screenStyles.sidebarCard}>
+              <Text style={screenStyles.sectionEyebrow}>SỰ KIỆN CÙNG CHỦ ĐỀ</Text>
+              {relatedEvents.length ? relatedEvents.map((item) => (
+                <TouchableOpacity
+                  key={item._id}
+                  style={screenStyles.relatedItem}
+                  onPress={() => router.push(`/user-events/${item._id}`)}
+                >
+                  <View style={screenStyles.relatedIcon}>
+                    <MaterialCommunityIcons name="calendar-heart" size={18} color={colors.primary} />
+                  </View>
+                  <View style={screenStyles.relatedCopy}>
+                    <Text style={screenStyles.relatedTitle} numberOfLines={2}>{item.title}</Text>
+                    <Text style={screenStyles.relatedDate}>{formatDate(item.startDateTime)}</Text>
+                  </View>
+                  <MaterialCommunityIcons name="chevron-right" size={18} color="#94A3B8" />
+                </TouchableOpacity>
+              )) : (
+                <Text style={screenStyles.relatedEmpty}>Chưa có sự kiện liên quan.</Text>
+              )}
+            </View>
+          </View>
+        </View>
       </ScrollView>
 
       <View style={screenStyles.actionBar}>
@@ -477,11 +606,11 @@ export default function UserEventDetailScreen() {
               {submitting ? "Đang hủy..." : "Cancel Registration"}
             </Text>
           </TouchableOpacity>
-        ) : (
+        ) : canRegister ? (
           <TouchableOpacity
-            style={[screenStyles.primaryButton, !canRegister && screenStyles.disabledButton]}
+            style={screenStyles.primaryButton}
             onPress={handleRegister}
-            disabled={!canRegister || submitting}
+            disabled={submitting}
           >
             {submitting ? (
               <ActivityIndicator color="#FFFFFF" />
@@ -491,15 +620,27 @@ export default function UserEventDetailScreen() {
             <Text style={screenStyles.primaryButtonText}>
               {submitting
                 ? "Đang đăng ký..."
-                : full
-                  ? "Đã đủ số lượng"
-                  : registrationClosed
-                    ? "Đã đóng đăng ký"
-                    : registration?.status === "cancelled"
-                      ? "Register Again"
-                      : "Register Event"}
+                : registration?.registrationStatus === "cancelled"
+                  ? "Đăng ký lại"
+                  : "Đăng ký sự kiện"}
             </Text>
           </TouchableOpacity>
+        ) : (
+          <View style={screenStyles.closedFooter}>
+            <View style={screenStyles.closedStatus}>
+              <MaterialCommunityIcons
+                name={full ? "account-lock" : "calendar-lock"}
+                size={18}
+                color="#64748B"
+              />
+              <Text style={screenStyles.closedStatusText}>
+                {full ? "Đã đủ số lượng" : "Đã đóng đăng ký"}
+              </Text>
+            </View>
+            <Text style={screenStyles.footerEndDate}>
+              Sự kiện kết thúc · {formatDate(event.endDateTime || event.startDateTime)}
+            </Text>
+          </View>
         )}
       </View>
     </SafeAreaView>
@@ -517,6 +658,30 @@ function InfoRow({
 }) {
   return (
     <View style={screenStyles.infoRow}>
+      <View style={screenStyles.infoIcon}>
+        <MaterialCommunityIcons name={icon} size={18} color="#0F766E" />
+      </View>
+      <View style={screenStyles.infoTextWrap}>
+        <Text style={screenStyles.infoLabel}>{label}</Text>
+        <Text style={screenStyles.infoValue}>{value}</Text>
+      </View>
+    </View>
+  );
+}
+
+function InfoCell({
+  icon,
+  label,
+  value,
+  desktop,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  label: string;
+  value: string;
+  desktop: boolean;
+}) {
+  return (
+    <View style={[screenStyles.infoCell, desktop && screenStyles.infoCellDesktop]}>
       <View style={screenStyles.infoIcon}>
         <MaterialCommunityIcons name={icon} size={18} color="#0F766E" />
       </View>
@@ -563,6 +728,8 @@ const screenStyles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "#E5F3EF",
+    zIndex: 20,
+    elevation: 4,
   },
   iconButton: {
     width: 42,
@@ -622,6 +789,9 @@ const screenStyles = StyleSheet.create({
     fontWeight: "800",
   },
   content: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
     padding: 16,
     paddingBottom: 120,
   },
@@ -729,8 +899,31 @@ const screenStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "800",
   },
-  infoCard: {
+  detailLayout: {
     marginTop: 14,
+    gap: 14,
+  },
+  detailLayoutDesktop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  mainColumn: {
+    flex: 1,
+    minWidth: 0,
+    gap: 14,
+  },
+  sidebar: {
+    width: "100%",
+    gap: 12,
+  },
+  sidebarDesktop: {
+    width: 300,
+    flexShrink: 0,
+    alignSelf: "flex-start",
+    position: "sticky" as any,
+    top: 16,
+  },
+  infoCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 16,
@@ -738,14 +931,38 @@ const screenStyles = StyleSheet.create({
     borderColor: "#E5F3EF",
     gap: 13,
   },
-  registrationCard: {
-    marginTop: 14,
+  sidebarCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 16,
+    borderRadius: 16,
+    padding: 15,
     borderWidth: 1,
     borderColor: "#E5F3EF",
-    gap: 13,
+    gap: 12,
+  },
+  sectionEyebrow: {
+    color: "#64748B",
+    fontSize: 11,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+  },
+  infoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -7,
+  },
+  infoCell: {
+    width: "100%",
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+    paddingHorizontal: 7,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  infoCellDesktop: {
+    width: "50%",
   },
   sectionTitle: {
     color: colors.dark,
@@ -781,6 +998,76 @@ const screenStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "800",
   },
+  attendedNotice: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "#ECFDF5",
+  },
+  attendedNoticeText: {
+    flex: 1,
+    color: "#047857",
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: "700",
+  },
+  ratingButton: {
+    minHeight: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#FFFFFF",
+  },
+  ratingButtonText: {
+    color: colors.primary,
+    fontWeight: "900",
+    fontSize: 13,
+  },
+  outlineButtonDisabled: {
+    opacity: 0.45,
+  },
+  shareButton: {
+    minHeight: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#FFFFFF",
+  },
+  shareButtonText: {
+    color: "#475569",
+    fontWeight: "800",
+    fontSize: 13,
+  },
+  relatedItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+    paddingVertical: 9,
+    borderTopWidth: 1,
+    borderTopColor: "#F1F5F9",
+  },
+  relatedIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E5FBF4",
+  },
+  relatedCopy: { flex: 1, minWidth: 0 },
+  relatedTitle: { color: colors.dark, fontSize: 12, lineHeight: 17, fontWeight: "800" },
+  relatedDate: { color: "#94A3B8", fontSize: 10, marginTop: 2 },
+  relatedEmpty: { color: "#94A3B8", fontSize: 12, paddingVertical: 6 },
   actionBar: {
     position: "absolute",
     left: 0,
@@ -791,6 +1078,19 @@ const screenStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#E5F3EF",
   },
+  closedFooter: {
+    width: "100%",
+    maxWidth: 1148,
+    alignSelf: "center",
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  closedStatus: { flexDirection: "row", alignItems: "center", gap: 7 },
+  closedStatusText: { color: "#475569", fontSize: 13, fontWeight: "800" },
+  footerEndDate: { color: "#64748B", fontSize: 12, textAlign: "right" },
   primaryButton: {
     minHeight: 52,
     borderRadius: 15,
@@ -802,9 +1102,6 @@ const screenStyles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: "#EF4444",
-  },
-  disabledButton: {
-    backgroundColor: "#9CA3AF",
   },
   primaryButtonText: {
     color: "#FFFFFF",

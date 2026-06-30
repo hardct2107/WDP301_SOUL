@@ -23,6 +23,10 @@ db.tags.drop();
 db.reports.drop();
 db.moderation_logs.drop();
 db.events.drop();
+db.event_registrations.drop();
+db.event_attendance_audits.drop();
+db.event_registration_mutexes.drop();
+db.event_ratings.drop();
 db.notifications.drop();
 db.friend_requests.drop();
 db.friendships.drop();
@@ -1383,31 +1387,6 @@ db.createCollection("events", {
           bsonType: "int"
         },
 
-        participants: {
-          bsonType: "array",
-          items: {
-            bsonType: "object",
-            required: ["userId", "status", "registeredAt"],
-            properties: {
-              userId: {
-                bsonType: "objectId"
-              },
-
-              status: {
-                enum: ["registered", "cancelled", "attended"]
-              },
-
-              registeredAt: {
-                bsonType: "date"
-              },
-
-              cancelledAt: {
-                bsonType: ["date", "null"]
-              }
-            }
-          }
-        },
-
         status: {
           enum: ["upcoming", "ongoing", "completed", "cancelled"]
         },
@@ -1452,7 +1431,129 @@ db.events.createIndex({ status: 1 });
 db.events.createIndex({ startDateTime: 1 });
 db.events.createIndex({ createdBy: 1 });
 db.events.createIndex({ approvalStatus: 1 });
-db.events.createIndex({ "participants.userId": 1 });
+
+// =========================================
+// EVENT REGISTRATIONS & ATTENDANCE
+// =========================================
+
+db.createCollection("event_registrations", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: [
+        "eventId",
+        "userId",
+        "registrationStatus",
+        "attendanceStatus",
+        "registeredAt",
+        "createdAt",
+        "updatedAt"
+      ],
+      properties: {
+        eventId: { bsonType: "objectId" },
+        userId: { bsonType: "objectId" },
+        registrationStatus: { enum: ["registered", "cancelled"] },
+        attendanceStatus: { enum: ["not_checked_in", "attended", "absent"] },
+        registeredAt: { bsonType: "date" },
+        cancelledAt: { bsonType: ["date", "null"] },
+        checkedInAt: { bsonType: ["date", "null"] },
+        attendanceUpdatedAt: { bsonType: ["date", "null"] },
+        attendanceUpdatedBy: { bsonType: ["objectId", "null"] },
+        createdAt: { bsonType: "date" },
+        updatedAt: { bsonType: "date" }
+      }
+    }
+  }
+});
+
+db.event_registrations.createIndex({ eventId: 1, userId: 1 }, { unique: true });
+db.event_registrations.createIndex({ eventId: 1, registrationStatus: 1, attendanceStatus: 1 });
+db.event_registrations.createIndex({ userId: 1, registrationStatus: 1 });
+
+db.createCollection("event_attendance_audits", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: [
+        "eventId",
+        "registrationId",
+        "userId",
+        "changedBy",
+        "fromStatus",
+        "toStatus",
+        "createdAt",
+        "updatedAt"
+      ],
+      properties: {
+        eventId: { bsonType: "objectId" },
+        registrationId: { bsonType: "objectId" },
+        userId: { bsonType: "objectId" },
+        changedBy: { bsonType: "objectId" },
+        fromStatus: { enum: ["not_checked_in", "attended", "absent"] },
+        toStatus: { enum: ["not_checked_in", "attended", "absent"] },
+        reason: { bsonType: "string", maxLength: 500 },
+        createdAt: { bsonType: "date" },
+        updatedAt: { bsonType: "date" }
+      }
+    }
+  }
+});
+
+db.event_attendance_audits.createIndex({ eventId: 1, createdAt: -1 });
+db.event_attendance_audits.createIndex({ registrationId: 1 });
+
+db.createCollection("event_registration_mutexes", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["userId", "createdAt", "updatedAt"],
+      properties: {
+        userId: { bsonType: "objectId" },
+        lockOwner: { bsonType: ["string", "null"] },
+        lockedUntil: { bsonType: ["date", "null"] },
+        createdAt: { bsonType: "date" },
+        updatedAt: { bsonType: "date" }
+      }
+    }
+  }
+});
+
+db.event_registration_mutexes.createIndex({ userId: 1 }, { unique: true });
+db.event_registration_mutexes.createIndex({ lockedUntil: 1 });
+
+// =========================================
+// EVENT RATINGS
+// =========================================
+
+db.createCollection("event_ratings", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["eventId", "userId", "rating", "status", "createdAt", "updatedAt"],
+      properties: {
+        eventId: { bsonType: "objectId" },
+        userId: { bsonType: "objectId" },
+        rating: { bsonType: "int", minimum: 1, maximum: 5 },
+        comment: { bsonType: "string", maxLength: 500 },
+        status: { enum: ["visible", "hidden"] },
+        hiddenReason: {
+          enum: ["spam", "offensive", "advertisement", "other", null]
+        },
+        hiddenNote: { bsonType: ["string", "null"], maxLength: 500 },
+        hiddenBy: { bsonType: ["objectId", "null"] },
+        hiddenAt: { bsonType: ["date", "null"] },
+        restoredBy: { bsonType: ["objectId", "null"] },
+        restoredAt: { bsonType: ["date", "null"] },
+        createdAt: { bsonType: "date" },
+        updatedAt: { bsonType: "date" }
+      }
+    }
+  }
+});
+
+db.event_ratings.createIndex({ eventId: 1, userId: 1 }, { unique: true });
+db.event_ratings.createIndex({ eventId: 1, status: 1, createdAt: -1 });
+db.event_ratings.createIndex({ status: 1, rating: 1, createdAt: -1 });
 
 // =========================================
 // FRIEND REQUESTS

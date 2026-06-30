@@ -168,6 +168,27 @@ export default function AdminEventDetail() {
           <MaterialCommunityIcons name="chevron-right" size={22} color="#94A3B8" />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.registrationManageBtn}
+          onPress={() =>
+            router.push({
+              pathname: "/(admin)/ratings",
+              params: { eventId: String(id) },
+            })
+          }
+        >
+          <View style={styles.registrationManageIcon}>
+            <MaterialCommunityIcons name="message-star-outline" size={22} color="#F59E0B" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.registrationManageTitle}>Quản lý đánh giá</Text>
+            <Text style={styles.registrationManageSubtitle}>
+              Xem điểm trung bình, nhận xét và kiểm duyệt đánh giá
+            </Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={22} color="#94A3B8" />
+        </TouchableOpacity>
+
         <View style={styles.detailSection}>
           <Text style={styles.detailTitle}>{event.title}</Text>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,10 +14,41 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuthStore } from "@/store";
 import { colors } from "@/constants/colors";
+import { eventAdminService } from "@/services/eventApi";
+
+type EventDashboardStats = {
+  registeredCount: number;
+  cancelledCount: number;
+  attendedCount: number;
+  absentCount: number;
+  attendanceRate: number;
+  reviewRate: number;
+  averageRating: number;
+};
+
+const EMPTY_EVENT_STATS: EventDashboardStats = {
+  registeredCount: 0,
+  cancelledCount: 0,
+  attendedCount: 0,
+  absentCount: 0,
+  attendanceRate: 0,
+  reviewRate: 0,
+  averageRating: 0,
+};
 
 export default function AdminDashboard() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const [eventStats, setEventStats] = useState(EMPTY_EVENT_STATS);
+
+  useEffect(() => {
+    eventAdminService
+      .getDashboardStatistics()
+      .then((response) => {
+        if (response.success) setEventStats(response.data || EMPTY_EVENT_STATS);
+      })
+      .catch(() => setEventStats(EMPTY_EVENT_STATS));
+  }, []);
 
   const handleLogout = () => {
     Alert.alert(
@@ -39,28 +70,40 @@ export default function AdminDashboard() {
 
   const stats = [
     {
-      label: "Người dùng",
-      value: "1,250",
-      icon: "account-group",
+      label: "Registered",
+      value: String(eventStats.registeredCount),
+      icon: "account-check",
       color: "#14B8A6",
     },
     {
-      label: "Báo cáo mới",
-      value: "12",
-      icon: "alert-decagram",
+      label: "Cancelled",
+      value: String(eventStats.cancelledCount),
+      icon: "account-cancel",
       color: "#EF4444",
     },
     {
-      label: "Chat Sessions",
-      value: "348",
-      icon: "chat-processing",
+      label: "Attended / Absent",
+      value: `${eventStats.attendedCount} / ${eventStats.absentCount}`,
+      icon: "account-star",
       color: "#F59E0B",
     },
     {
-      label: "Kiểm duyệt AI",
-      value: "98.4%",
-      icon: "robot",
+      label: "Attendance rate",
+      value: `${eventStats.attendanceRate}%`,
+      icon: "chart-donut",
       color: "#3B82F6",
+    },
+    {
+      label: "Review rate",
+      value: `${eventStats.reviewRate}%`,
+      icon: "message-star-outline",
+      color: "#8B5CF6",
+    },
+    {
+      label: "Average rating",
+      value: eventStats.averageRating.toFixed(1),
+      icon: "star",
+      color: "#F59E0B",
     },
   ];
 
@@ -92,6 +135,13 @@ export default function AdminDashboard() {
       icon: "calendar-star",
       color: colors.darkTeal,
       route: "/(admin)/events",
+    },
+    {
+      title: "Đánh giá sự kiện",
+      description: "Xem thống kê, kiểm duyệt và xuất phản hồi người tham dự",
+      icon: "message-star-outline",
+      color: "#F59E0B",
+      route: "/(admin)/ratings",
     },
     {
       title: "Cấu hình Hệ thống AI",
