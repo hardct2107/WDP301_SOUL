@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "migrate:event-registrations": "node ./src/scripts/migrateEventRegistrations.js",
+    "test:rating-model": "node ./src/tests/testEventRatingModel.js",
+    "test:registration-model": "node ./src/tests/testEventRegistrationModel.js",
+    "test:registration-integration": "node ./src/tests/testEventRegistrationIntegration.js",
+    "test:rating-integration": "node ./src/tests/testEventRatingIntegration.js"
   },
   "engines": {
     "node": "22.x"

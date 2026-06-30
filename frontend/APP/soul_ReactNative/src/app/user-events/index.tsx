@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { colors } from "@/constants/colors";
 import { eventUserService } from "@/services/eventApi";
+import { RatingSummary } from "@/api/ratingApi";
 import {
   buildRegistrationMap,
   eventStatusMeta,
@@ -40,6 +41,7 @@ type CommunityEvent = {
   capacity?: number | null;
   registeredCount?: number;
   status: EventStatus;
+  ratingSummary?: RatingSummary;
 };
 
 const filters: { label: string; value: EventFilter }[] = [
@@ -144,8 +146,8 @@ export default function UserEventListScreen() {
     const computedStatus = getComputedEventStatus(item);
     const eventStatus = eventStatusMeta[computedStatus] || eventStatusMeta.upcoming;
     const registration = registrationMap[item._id];
-    const registrationStatus = registration?.status
-      ? registrationMeta[registration.status]
+    const registrationStatus = registration?.registrationStatus
+      ? registrationMeta[registration.registrationStatus]
       : null;
     const remainingSlots = getRemainingSlots(item.capacity, item.registeredCount || 0);
     const fillRate = getFillRate(item.capacity, item.registeredCount || 0);
@@ -210,6 +212,16 @@ export default function UserEventListScreen() {
           {item.description ||
             "SOUL emotional wellness event for reflection and safe community support."}
         </Text>
+
+        <View style={screenStyles.ratingRow}>
+          <MaterialCommunityIcons name="star" size={17} color="#F59E0B" />
+          <Text style={screenStyles.ratingValue}>
+            {(item.ratingSummary?.average || 0).toFixed(1)}
+          </Text>
+          <Text style={screenStyles.ratingCount}>
+            ({item.ratingSummary?.total || 0} đánh giá)
+          </Text>
+        </View>
 
         <View style={screenStyles.infoGrid}>
           <InfoRow icon="clock-outline" text={formatDateTime(item.startDateTime)} />
@@ -278,7 +290,7 @@ export default function UserEventListScreen() {
           <View>
             <View style={screenStyles.heroCard}>
               <View style={screenStyles.heroBadge}>
-                <MaterialCommunityIcons name="sparkles" size={15} color="#FFFFFF" />
+                <MaterialCommunityIcons name="star-four-points" size={15} color="#FFFFFF" />
                 <Text style={screenStyles.heroBadgeText}>SOUL Events</Text>
               </View>
               <Text style={screenStyles.heroTitle}>Find healing activities</Text>
@@ -370,6 +382,20 @@ function InfoRow({
 }
 
 const screenStyles = StyleSheet.create({
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 12,
+  },
+  ratingValue: {
+    color: "#92400E",
+    fontWeight: "800",
+  },
+  ratingCount: {
+    color: "#64748B",
+    fontSize: 12,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: colors.bg,

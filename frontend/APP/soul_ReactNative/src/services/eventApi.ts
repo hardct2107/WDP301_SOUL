@@ -1,6 +1,12 @@
 import apiClient from "./api";
 
-type RegistrationStatusFilter = "all" | "registered" | "cancelled";
+type RegistrationStatusFilter =
+  | "all"
+  | "registered"
+  | "cancelled"
+  | "not_checked_in"
+  | "attended"
+  | "absent";
 type EventStatusFilter = "all" | "upcoming" | "ongoing" | "completed" | "cancelled";
 
 const getErrorMessage = (error: any, fallback: string) =>
@@ -22,6 +28,10 @@ const fetchEvents = async (params?: {
 };
 
 export const eventAdminService = {
+  getDashboardStatistics: async () => {
+    const response = await apiClient.get("/admin/events/statistics");
+    return response.data;
+  },
   getEvents: async () => {
     try {
       return await fetchEvents();
@@ -61,6 +71,24 @@ export const eventAdminService = {
       );
       const errStatus = error.response?.status;
       console.error(`[EventAPI] getEventRegistrations loi ${errStatus}:`, errMsg);
+      throw new Error(errMsg);
+    }
+  },
+
+  updateAttendance: async (
+    eventId: string,
+    userId: string,
+    attendanceStatus: "not_checked_in" | "attended" | "absent",
+    reason = ""
+  ) => {
+    try {
+      const response = await apiClient.patch(
+        `/admin/events/${eventId}/participants/${userId}/attendance`,
+        { attendanceStatus, reason }
+      );
+      return response.data;
+    } catch (error: any) {
+      const errMsg = getErrorMessage(error, "Khong the cap nhat tham du");
       throw new Error(errMsg);
     }
   },
@@ -134,11 +162,12 @@ export const eventUserService = {
   getRegisteredEvents: async (
     status: RegistrationStatusFilter = "all",
     page = 1,
-    limit = 100
+    limit = 100,
+    search = ""
   ) => {
     try {
       const response = await apiClient.get("/events/me/registered", {
-        params: { status, page, limit },
+        params: { status, page, limit, search: search || undefined },
       });
       return response.data;
     } catch (error: any) {
