@@ -139,7 +139,7 @@ export const adminForumStyles = StyleSheet.create({
     paddingHorizontal: 10,
     fontFamily: webFont,
     // @ts-ignore
-    outlineStyle: "none",
+    // outlineStyle: "none",
   },
 
   // ── Filter Chips ──────────────────────────────────────────────────────────

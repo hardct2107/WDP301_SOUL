@@ -11,26 +11,21 @@ import {
 import { router } from "expo-router";
 import { useAuthStore } from "@/store";
 import { styles } from "@/styles/home.styles";
-import { colors } from "@/constants/colors";
 import { ProfileModals } from "./ProfileModals";
 
 type Props = {
   showSidebar: boolean;
   onToggleSidebar: () => void;
+  webMode?: boolean;
 };
 
-export function HomeHeader({ showSidebar, onToggleSidebar }: Props) {
+export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Props) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const { user, logout } = useAuthStore();
 
-  // States quản lý hiển thị Modals xem và sửa thông tin cá nhân
   const [showMyProfile, setShowMyProfile] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
 
-  // Lấy tên gọi thân mật (từ đầu tiên của họ tên, mặc định là Vy)
-  const greetingName = user ? user.fullName.split(" ")[0] : "Vy";
-
-  // Xử lý sự kiện từ menu Avatar
   const handleActionPress = (text: string) => {
     if (text === "Log out") {
       logout();
@@ -45,63 +40,33 @@ export function HomeHeader({ showSidebar, onToggleSidebar }: Props) {
 
   return (
     <View style={styles.header}>
-      {/* Nút mở Sidebar trái - gradient when active */}
-      {showSidebar ? (
-        <TouchableOpacity
-          onPress={onToggleSidebar}
-          style={{ marginRight: 14 }}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={["#7C3AED", "#14B8A6"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.menuButton, { borderColor: "transparent", marginRight: 0 }]}
-          >
-            <MaterialCommunityIcons name="close" size={32} color="#FFFFFF" />
-          </LinearGradient>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={[styles.menuButton]}
-          onPress={onToggleSidebar}
-        >
-          <MaterialCommunityIcons
-            name="menu"
-            size={32}
-            color="#7C3AED"
-          />
-        </TouchableOpacity>
-      )}
-
-      {/* Lời chào mừng */}
-      <View style={styles.greetingBox}>
-        <Text style={styles.headerTitle}>Hi, {greetingName} 👋</Text>
-        <Text style={styles.headerSubtitle}>
-          Welcome back to your safe space
-        </Text>
+      {/* Left side: Hamburger (if not web) + Logo */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        {!webMode && (
+          <TouchableOpacity onPress={onToggleSidebar} activeOpacity={0.8}>
+            {showSidebar ? (
+              <MaterialCommunityIcons name="close" size={28} color="#1E293B" />
+            ) : (
+              <MaterialCommunityIcons name="menu" size={28} color="#1E293B" />
+            )}
+          </TouchableOpacity>
+        )}
+        <Text style={styles.logoText}>SOUL</Text>
       </View>
 
-      {/* Thông báo & Avatar */}
+      {/* Right side: Notification & Avatar */}
       <View style={styles.headerRight}>
         <View style={styles.bellWrap}>
           <MaterialCommunityIcons
             name="bell-outline"
-            size={26}
-            color="#7C3AED"
+            size={22}
+            color="#475569"
           />
-          {/* Gradient notification badge */}
-          <LinearGradient
-            colors={["#F59E0B", "#EF4444"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.badge}
-          >
+          <View style={styles.badge}>
             <Text style={styles.badgeText}>3</Text>
-          </LinearGradient>
+          </View>
         </View>
 
-        {/* Bấm Avatar hiển thị popover menu */}
         <Pressable
           style={styles.profileWrapper}
           onPress={() => setShowProfileMenu(!showProfileMenu)}
@@ -154,7 +119,6 @@ export function HomeHeader({ showSidebar, onToggleSidebar }: Props) {
         </Pressable>
       </View>
 
-      {/* Nhúng các Modal Profile tách riêng */}
       <ProfileModals
         showMyProfile={showMyProfile}
         onCloseMyProfile={() => setShowMyProfile(false)}

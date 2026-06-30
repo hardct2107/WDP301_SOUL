@@ -2,45 +2,46 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
-import { colors } from "@/constants/colors";
 
 export function HeroCard() {
   return (
-    <LinearGradient
-      colors={["#7C3AED", "#6366F1", "#14B8A6"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.heroCard}
-    >
-      <View style={styles.heroBadge}>
-        <Text style={styles.heroBadgeText}>✨ Daily Insight</Text>
-      </View>
+    <View style={styles.heroContainer}>
+      <LinearGradient
+        colors={["#faf5ff", "#ede9fe", "#fce7f3"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.heroCard}
+      >
+        <View style={styles.heroBadge}>
+          <Text style={styles.heroBadgeText}>✨ AI đồng hành sức khỏe tinh thần 24/7</Text>
+        </View>
 
-      <Text style={styles.heroTitle}>
-        You're stronger{"\n"}than you think 💜
-      </Text>
+        <Text style={styles.heroTitle}>
+          Tâm trí bình an —{"\n"}
+          <Text style={{ color: "#D946EF" }}>bắt đầu từ một cuộc trò chuyện</Text>
+        </Text>
 
-      <Text style={styles.heroDescription}>
-        Small steps today,{"\n"}big change tomorrow.
-      </Text>
+        <Text style={styles.heroDescription}>
+          SOUL là người bạn AI lắng nghe, thấu hiểu và đồng hành cùng bạn trên hành trình chăm sóc sức khỏe tinh thần mỗi ngày.
+        </Text>
 
-      <TouchableOpacity style={styles.heroButton}>
-        <Text style={styles.heroButtonText}>Start your journey</Text>
+        <View style={styles.heroButtons}>
+          <TouchableOpacity style={{ flex: 1 }} activeOpacity={0.8}>
+            <LinearGradient
+              colors={["#7C3AED", "#A855F7"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.heroButtonPrimary}
+            >
+              <Text style={styles.heroButtonPrimaryText}>Bắt đầu trò chuyện</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        <MaterialCommunityIcons
-          name="arrow-right"
-          size={22}
-          color={colors.primary}
-        />
-      </TouchableOpacity>
-
-      {/* Decorative floating element */}
-      <MaterialCommunityIcons
-        name="flower-tulip-outline"
-        size={230}
-        color="rgba(255,255,255,0.18)"
-        style={styles.heroDecor}
-      />
-    </LinearGradient>
+          <TouchableOpacity style={styles.heroButtonSecondary} activeOpacity={0.8}>
+            <Text style={styles.heroButtonSecondaryText}>Tìm hiểu thêm</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+    </View>
   );
 }

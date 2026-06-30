@@ -5,714 +5,1032 @@ const webFont = Platform.select({ web: "'Inter', system-ui, sans-serif", default
 const displayFont = Platform.select({ web: "'Lexend', 'Inter', system-ui", default: undefined });
 
 const cardShadow = Platform.select({
-  ios: { shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } },
+  ios: { shadowColor: "#7C3AED", shadowOpacity: 0.08, shadowRadius: 24, shadowOffset: { width: 0, height: 8 } },
   android: { elevation: 4 },
-  web: { boxShadow: "0 4px 20px rgba(124, 58, 237, 0.1)" },
+  web: { boxShadow: "0 8px 32px rgba(124, 58, 237, 0.08)" },
   default: { elevation: 4 },
 });
 
+export const webStyles = StyleSheet.create({
+  root: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "#FAFAFC",
+  },
+  sidebarCol: {
+    width: 272,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRightWidth: 1,
+    borderRightColor: "rgba(124, 58, 237, 0.1)",
+    ...Platform.select({
+      web: { boxShadow: "2px 0 24px rgba(124, 58, 237, 0.05)", backdropFilter: "blur(20px)" } as any,
+      default: {},
+    }),
+  },
+  contentArea: {
+    flex: 1,
+    backgroundColor: "#FAFAFC",
+  },
+  contentInner: {
+    paddingHorizontal: 32,
+    paddingTop: 28,
+    paddingBottom: 48,
+  },
+  twoCol: {
+    flexDirection: "row",
+    gap: 20,
+    marginBottom: 20,
+  },
+  colLeft: {
+    flex: 1,
+  },
+  colRight: {
+    flex: 1,
+  },
+});
+
 export const styles = StyleSheet.create({
-  // ── Page ──────────────────────────────────────────────────────────────────
   page: {
     flex: 1,
-    backgroundColor: colors.bg,
+    backgroundColor: "#FAFAFC",
   },
-
   main: {
     flex: 1,
-    paddingHorizontal: 18,
-    paddingTop: 36,
   },
-
-  // ── Header ────────────────────────────────────────────────────────────────
+  sectionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 22,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "android" ? 48 : 60,
+    paddingBottom: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(124, 58, 237, 0.08)",
     position: "relative",
     zIndex: 999,
   },
-
-  menuButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...Platform.select({
-      ios: { shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
-      android: { elevation: 3 },
-      web: { boxShadow: "0 2px 8px rgba(0,0,0,0.06)" },
-      default: { elevation: 3 },
-    }),
-  },
-
-  menuButtonActive: {
-    backgroundColor: colors.primaryBg,
-    borderColor: colors.borderPrimary,
-  },
-
-  greetingBox: {
-    flex: 1,
-  },
-
-  headerTitle: {
-    fontSize: 24,
+  logoText: {
+    fontSize: 22,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: colors.primary,
     fontFamily: displayFont,
+    letterSpacing: 1.5,
   },
-
-  headerSubtitle: {
-    marginTop: 3,
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontFamily: webFont,
-  },
-
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    position: "relative",
-    zIndex: 999,
+    gap: 16,
   },
-
   bellWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surface,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F3F4F6",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
   },
-
   badge: {
     position: "absolute",
-    top: 0,
-    right: 0,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    top: -2,
+    right: -2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
-
   badgeText: {
     color: "#FFFFFF",
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
   },
-
   profileWrapper: {
     position: "relative",
     zIndex: 9999,
   },
-
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2.5,
-    borderColor: colors.primary,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: "rgba(124, 58, 237, 0.2)",
   },
-
-  // ── Profile Dropdown ──────────────────────────────────────────────────────
   profileMenu: {
     position: "absolute",
-    top: 58,
+    top: 52,
     right: 0,
-    width: 290,
+    width: 260,
     borderRadius: 24,
-    padding: 18,
-    backgroundColor: colors.glassBg,
-    ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 10 } },
-      android: { elevation: 20 },
-      web: { boxShadow: "0 16px 48px rgba(124, 58, 237, 0.18)", backdropFilter: "blur(20px)" },
-      default: { elevation: 20 },
-    }),
+    padding: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    ...cardShadow,
     zIndex: 99999,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
+    borderColor: "rgba(124, 58, 237, 0.1)",
   },
-
   profileTop: {
     flexDirection: "row",
     alignItems: "center",
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: "rgba(0,0,0,0.05)",
   },
-
   profileImg: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     marginRight: 12,
-    borderWidth: 2,
-    borderColor: colors.borderPrimary,
   },
-
   profileName: {
     fontSize: 16,
     fontWeight: "800",
     color: colors.textPrimary,
     fontFamily: displayFont,
   },
-
   profileSub: {
-    marginTop: 3,
+    marginTop: 2,
     color: colors.textSecondary,
     fontSize: 12,
-    fontWeight: "500",
     fontFamily: webFont,
   },
-
   profileAction: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
     gap: 12,
   },
-
   profileLogout: {
-    marginTop: 6,
+    marginTop: 4,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 14,
+    borderTopColor: "rgba(0,0,0,0.05)",
+    paddingTop: 12,
   },
-
   profileActionText: {
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "600",
     color: colors.textPrimary,
     fontFamily: webFont,
   },
-
-  // ── Hero Card ─────────────────────────────────────────────────────────────
+  heroContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
   heroCard: {
-    minHeight: 280,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    padding: 24,
-    marginBottom: 18,
+    minHeight: 380,
+    borderRadius: 32,
+    padding: 28,
     overflow: "hidden",
     position: "relative",
+    justifyContent: "flex-end",
     ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.4, shadowRadius: 24, shadowOffset: { width: 0, height: 10 } },
-      android: { elevation: 10 },
-      web: { boxShadow: "0 12px 40px rgba(124, 58, 237, 0.45)" },
-      default: { elevation: 10 },
+      ios: { shadowColor: "#7C3AED", shadowOpacity: 0.15, shadowRadius: 30, shadowOffset: { width: 0, height: 12 } },
+      android: { elevation: 8 },
+      web: { boxShadow: "0 16px 48px rgba(124, 58, 237, 0.15)" },
+      default: { elevation: 8 },
     }),
   },
-
   heroBadge: {
     alignSelf: "flex-start",
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    marginBottom: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    marginBottom: "auto" as any,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
+    borderColor: "rgba(255, 255, 255, 0.8)",
   },
-
   heroBadgeText: {
-    color: "#FFFFFF",
+    color: "#5B21B6",
     fontWeight: "700",
     fontSize: 12,
     fontFamily: webFont,
-    letterSpacing: 0.5,
   },
-
   heroTitle: {
-    fontSize: 30,
-    lineHeight: 38,
-    fontWeight: "800",
-    color: "#FFFFFF",
+    fontSize: 34,
+    lineHeight: 44,
+    fontWeight: "900",
+    color: "#1E293B",
     fontFamily: displayFont,
+    marginBottom: 8,
   },
-
   heroDescription: {
-    marginTop: 12,
-    fontSize: 15,
-    color: "rgba(255,255,255,0.85)",
-    lineHeight: 23,
+    fontSize: 16,
+    color: "#475569",
+    lineHeight: 24,
     fontFamily: webFont,
+    marginBottom: 28,
   },
-
-  heroButton: {
-    marginTop: 24,
-    width: 210,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+  heroButtons: {
     flexDirection: "row",
+    gap: 12,
+  },
+  heroButtonPrimary: {
+    flex: 1,
+    height: 54,
+    borderRadius: 27,
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
     ...Platform.select({
-      ios: { shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },
-      android: { elevation: 4 },
-      web: { boxShadow: "0 4px 16px rgba(0,0,0,0.15)" },
-      default: { elevation: 4 },
+      ios: { shadowColor: "#7C3AED", shadowOpacity: 0.3, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } },
+      android: { elevation: 6 },
+      web: { boxShadow: "0 6px 20px rgba(124, 58, 237, 0.3)" },
     }),
   },
-
-  heroButtonText: {
-    color: colors.primary,
+  heroButtonPrimaryText: {
+    color: "#FFFFFF",
     fontWeight: "800",
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: displayFont,
   },
-
-  heroDecor: {
-    position: "absolute",
-    right: -36,
-    bottom: -10,
-  },
-
-  // ── Feature Grid (Quick Actions) ──────────────────────────────────────────
-  featureGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 18,
-  },
-
-  featureCard: {
-    width: "48%",
-    minHeight: 170,
-    borderRadius: 24,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...cardShadow,
-  },
-
-  featureIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: colors.primaryBg,
+  heroButtonSecondary: {
+    flex: 1,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 1)",
   },
-
-  featureTitle: {
+  heroButtonSecondaryText: {
+    color: "#475569",
+    fontWeight: "700",
     fontSize: 15,
-    fontWeight: "800",
-    color: colors.textPrimary,
     fontFamily: displayFont,
   },
-
-  featureSub: {
-    marginTop: 6,
-    color: colors.textSecondary,
+  chatDemoCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    marginHorizontal: 20,
+    marginBottom: 32,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(124, 58, 237, 0.05)",
+    ...cardShadow,
+  },
+  chatDemoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+  },
+  chatDemoAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  chatDemoTitle: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 16,
+    fontFamily: displayFont,
+  },
+  chatDemoStatus: {
+    color: "rgba(255,255,255,0.8)",
     fontSize: 12,
-    fontWeight: "500",
+  },
+  chatDemoBody: {
+    padding: 20,
+    backgroundColor: "#FAFAFC",
+  },
+  chatBubbleAi: {
+    backgroundColor: "#FFFFFF",
+    padding: 14,
+    borderRadius: 20,
+    borderBottomLeftRadius: 4,
+    alignSelf: "flex-start",
+    maxWidth: "85%",
+    marginBottom: 12,
+    ...Platform.select({
+      ios: { shadowColor: "#000", shadowOpacity: 0.03, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
+      android: { elevation: 1 },
+      web: { boxShadow: "0 2px 10px rgba(0,0,0,0.03)" },
+    }),
+  },
+  chatBubbleUser: {
+    padding: 14,
+    borderRadius: 20,
+    borderBottomRightRadius: 4,
+    alignSelf: "flex-end",
+    maxWidth: "85%",
+    marginBottom: 12,
+  },
+  chatTextAi: {
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 22,
     fontFamily: webFont,
   },
-
-  arrowCircle: {
-    marginTop: "auto" as any,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primaryBg,
+  chatTextUser: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    lineHeight: 22,
+    fontFamily: webFont,
+  },
+  chatTyping: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    padding: 14,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderBottomLeftRadius: 4,
+    alignSelf: "flex-start",
+  },
+  typingDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#C4B5FD",
+  },
+  chatDemoFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#FFFFFF",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.02)",
+  },
+  chatDemoInput: {
+    flex: 1,
+    height: 40,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    marginRight: 12,
+  },
+  chatDemoInputText: {
+    color: "#94A3B8",
+    fontSize: 14,
+  },
+  chatDemoSend: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // ── Row / Panel ───────────────────────────────────────────────────────────
-  row: {
-    flexDirection: "column",
-    gap: 16,
-    marginBottom: 16,
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
-
-  panel: {
-    width: "100%",
-    minHeight: 260,
-    backgroundColor: colors.surface,
+  statItem: {
+    alignItems: "center",
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: colors.primary,
+    fontFamily: displayFont,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 11,
+    color: "#64748B",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  motivationCard: {
+    marginHorizontal: 20,
+    marginBottom: 32,
     borderRadius: 24,
-    padding: 20,
+    padding: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    overflow: "hidden",
+  },
+  motivationTextWrap: {
+    flex: 1,
+  },
+  motivationTitle: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    fontWeight: "800",
+    fontFamily: displayFont,
+    marginBottom: 16,
+    lineHeight: 30,
+  },
+  motivationBtn: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 999,
+    alignSelf: "flex-start",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(255,255,255,0.4)",
+  },
+  motivationBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  articleCard: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.03)",
     ...cardShadow,
   },
-
-  panelHeader: {
+  articleImgMock: {
+    height: 140,
+    backgroundColor: "#FDE68A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  articleContent: {
+    padding: 24,
+  },
+  articleTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#1E293B",
+    fontFamily: displayFont,
+    marginBottom: 8,
+  },
+  articleDesc: {
+    fontSize: 14,
+    color: "#64748B",
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  tipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 12,
+  },
+  tipIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#EDE9FE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tipText: {
+    fontSize: 14,
+    color: "#334155",
+    fontWeight: "500",
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#1E293B",
+    fontFamily: displayFont,
+    marginBottom: 6,
+    paddingHorizontal: 20,
+  },
+  sectionSub: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  healingGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 14,
+    marginBottom: 32,
+  },
+  healingCardWrapper: {
+    width: "50%",
+    padding: 6,
+  },
+  healingCard: {
+    borderRadius: 24,
+    padding: 20,
+    minHeight: 160,
+    justifyContent: "space-between",
+  },
+  healingIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  healingTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#1E293B",
+    fontFamily: displayFont,
+    marginTop: 16,
+  },
+  healingSub: {
+    fontSize: 12,
+    color: "#475569",
+    marginTop: 4,
+    opacity: 0.8,
+  },
+  dashCard: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.03)",
+    ...cardShadow,
+  },
+  dashHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 20,
   },
-
-  panelTitle: {
-    fontSize: 17,
+  dashTitle: {
+    fontSize: 18,
     fontWeight: "800",
-    color: colors.textPrimary,
-    fontFamily: displayFont,
+    color: "#1E293B",
   },
-
-  panelLink: {
+  dashLink: {
+    fontSize: 13,
     color: colors.primary,
     fontWeight: "700",
-    fontSize: 13,
-    fontFamily: webFont,
   },
-
-  // ── Chart (Mood Analytics) ────────────────────────────────────────────────
   chartRow: {
-    height: 150,
-    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
+    height: 120,
   },
-
   chartItem: {
     alignItems: "center",
   },
-
-  emoji: {
-    marginBottom: 6,
-    fontSize: 18,
+  chartEmoji: {
+    fontSize: 20,
+    marginBottom: 8,
   },
-
   chartBar: {
-    width: 22,
+    width: 24,
     borderRadius: 12,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: "#EDE9FE",
   },
-
-  day: {
+  chartDay: {
     marginTop: 8,
-    color: colors.textSecondary,
-    fontWeight: "700",
-    fontSize: 11,
-    fontFamily: webFont,
+    fontSize: 12,
+    color: "#94A3B8",
+    fontWeight: "600",
   },
-
-  // ── Note Box (Weekly Insight) ─────────────────────────────────────────────
-  noteBox: {
-    marginTop: 20,
-    borderRadius: 18,
-    backgroundColor: colors.primaryBg,
-    padding: 14,
+  insightBox: {
+    marginTop: 24,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 20,
+    padding: 16,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     borderWidth: 1,
-    borderColor: colors.borderPrimary,
+    borderColor: "#F1F5F9",
   },
-
-  noteText: {
+  insightText: {
     flex: 1,
-    color: colors.primary,
-    lineHeight: 20,
-    fontSize: 13,
-    fontWeight: "600",
-    fontFamily: webFont,
+    fontSize: 14,
+    color: "#475569",
+    lineHeight: 22,
   },
-
-  // ── Center Box ────────────────────────────────────────────────────────────
-  centerBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 10,
+  communityCard: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 24,
+    ...cardShadow,
   },
-
-  suggestionText: {
-    marginTop: 8,
-    textAlign: "center",
-    color: colors.textPrimary,
-    fontWeight: "700",
-    lineHeight: 23,
-    fontSize: 15,
-    fontFamily: webFont,
-  },
-
-  startButton: {
-    marginTop: 16,
-    backgroundColor: colors.primary,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    borderRadius: 16,
-    ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.35, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
-      android: { elevation: 5 },
-      web: { boxShadow: "0 4px 16px rgba(124, 58, 237, 0.4)" },
-      default: { elevation: 5 },
-    }),
-  },
-
-  startButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    fontFamily: webFont,
-  },
-
-  // ── Community ─────────────────────────────────────────────────────────────
-  communityWrap: {
-    flexDirection: "column",
-    gap: 16,
-    marginTop: 18,
-  },
-
   userRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    marginBottom: 16,
   },
-
   smallAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: colors.borderPrimary,
+    backgroundColor: "#F1F5F9",
   },
-
   userName: {
+    fontSize: 16,
     fontWeight: "800",
-    color: colors.textPrimary,
-    fontSize: 15,
-    fontFamily: displayFont,
+    color: "#1E293B",
   },
-
-  newTag: {
-    fontSize: 11,
-    color: colors.teal,
-    fontWeight: "700",
-  },
-
   time: {
-    color: colors.textMuted,
-    marginTop: 3,
     fontSize: 12,
-    fontFamily: webFont,
+    color: "#94A3B8",
+    marginTop: 2,
   },
-
   postText: {
-    marginTop: 14,
-    color: colors.textPrimary,
-    lineHeight: 22,
-    fontSize: 14,
-    fontFamily: webFont,
+    fontSize: 15,
+    color: "#334155",
+    lineHeight: 24,
+    marginBottom: 16,
   },
-
-  illustrationBox: {
-    width: "100%",
-    height: 130,
-    borderRadius: 20,
-    backgroundColor: colors.accentBg,
+  reactRow: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  reactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#F8FAFC",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  reactText: {
+    fontSize: 13,
+    color: "#64748B",
+    fontWeight: "600",
+  },
+  eventCard: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    overflow: "hidden",
+    ...cardShadow,
+  },
+  eventImg: {
+    height: 160,
+    backgroundColor: "#CCFBF1",
     alignItems: "center",
     justifyContent: "center",
   },
-
-  reactRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    gap: 20,
+  eventContent: {
+    padding: 24,
   },
-
-  reactText: {
-    color: colors.textSecondary,
-    fontWeight: "700",
-    fontFamily: webFont,
-  },
-
-  // ── Event Card ────────────────────────────────────────────────────────────
   eventTitle: {
     fontSize: 18,
-    lineHeight: 25,
     fontWeight: "800",
-    color: colors.textPrimary,
+    color: "#1E293B",
+    marginBottom: 8,
+  },
+  eventMeta: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 20,
+  },
+  joinButton: {
+    backgroundColor: "#1E293B",
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  joinText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  testiScroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+  },
+  testiCard: {
+    width: 280,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 24,
+    marginRight: 16,
+    ...cardShadow,
+  },
+  starsRow: {
+    flexDirection: "row",
+    gap: 4,
+    marginBottom: 16,
+  },
+  testiText: {
+    fontSize: 15,
+    color: "#334155",
+    lineHeight: 24,
+    marginBottom: 20,
+    fontStyle: "italic",
+  },
+  testiUserRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  testiAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+  },
+  testiName: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1E293B",
+  },
+  testiRole: {
+    fontSize: 12,
+    color: "#94A3B8",
+  },
+  pricingRow: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginBottom: 32,
+    gap: 16,
+  },
+  priceCard: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+  },
+  priceCardPro: {
+    flex: 1.2,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    alignItems: "center",
+    ...cardShadow,
+  },
+  priceBadge: {
+    position: "absolute",
+    top: -12,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  priceBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "800",
+  },
+  priceTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#475569",
+    marginBottom: 8,
+  },
+  priceTitlePro: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: colors.primary,
+    marginBottom: 8,
+  },
+  priceAmount: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#1E293B",
+  },
+  priceAmountPro: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#1E293B",
+  },
+  priceSub: {
+    fontSize: 12,
+    color: "#94A3B8",
+    marginBottom: 20,
+  },
+  priceBtn: {
+    width: "100%",
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
+    alignItems: "center",
+  },
+  priceBtnPro: {
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+  },
+  priceBtnText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#475569",
+  },
+  priceBtnTextPro: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#FFFFFF",
+  },
+  ctaSection: {
+    marginHorizontal: 20,
+    marginBottom: 32,
+    borderRadius: 32,
+    padding: 32,
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  ctaTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginBottom: 12,
     fontFamily: displayFont,
   },
-
-  eventMeta: {
-    marginTop: 10,
-    color: colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 13,
-    fontFamily: webFont,
+  ctaSub: {
+    fontSize: 15,
+    color: "rgba(255,255,255,0.8)",
+    textAlign: "center",
+    marginBottom: 24,
   },
-
-  eventImage: {
+  ctaInputWrap: {
     width: "100%",
-    height: 130,
-    borderRadius: 20,
-    backgroundColor: colors.accentBg,
+    height: 54,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 27,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 20,
+    paddingRight: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  ctaInput: {
+    flex: 1,
+    color: "#FFFFFF",
+    fontSize: 15,
+  },
+  ctaBtn: {
+    height: 42,
+    paddingHorizontal: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
   },
-
-  joinButton: {
-    marginTop: 18,
-    alignSelf: "flex-start",
-    backgroundColor: colors.accent,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 14,
-    ...Platform.select({
-      ios: { shadowColor: colors.accent, shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },
-      android: { elevation: 4 },
-      web: { boxShadow: "0 4px 12px rgba(245, 158, 11, 0.4)" },
-      default: { elevation: 4 },
-    }),
-  },
-
-  joinText: {
-    color: "#FFFFFF",
+  ctaBtnText: {
+    color: colors.primary,
     fontWeight: "800",
-    fontFamily: webFont,
+    fontSize: 14,
   },
-
-  // ── Bottom Nav ────────────────────────────────────────────────────────────
+  footerWrap: {
+    alignItems: "center",
+    paddingVertical: 32,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  footerLogo: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#94A3B8",
+    letterSpacing: 2,
+    marginBottom: 16,
+  },
+  footerLinks: {
+    flexDirection: "row",
+    gap: 20,
+    marginBottom: 16,
+  },
+  footerLink: {
+    fontSize: 13,
+    color: "#64748B",
+    fontWeight: "500",
+  },
+  footerCopy: {
+    fontSize: 12,
+    color: "#CBD5E1",
+  },
   footer: {
-    height: 82,
-    borderRadius: 28,
-    backgroundColor: colors.surface,
-    marginTop: 8,
-    marginBottom: 28,
+    height: 86,
+    borderRadius: 43,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    marginHorizontal: 20,
+    marginBottom: Platform.OS === "ios" ? 32 : 24,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(124, 58, 237, 0.1)",
     ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.12, shadowRadius: 20, shadowOffset: { width: 0, height: -4 } },
-      android: { elevation: 8 },
-      web: { boxShadow: "0 -4px 24px rgba(124, 58, 237, 0.1)" },
-      default: { elevation: 8 },
+      ios: { shadowColor: "#7C3AED", shadowOpacity: 0.1, shadowRadius: 24, shadowOffset: { width: 0, height: 10 } },
+      android: { elevation: 12 },
+      web: { boxShadow: "0 10px 40px rgba(124, 58, 237, 0.15)" },
     }),
   },
-
   footerItem: {
     alignItems: "center",
+    justifyContent: "center",
+    width: 60,
   },
-
   footerText: {
     marginTop: 4,
-    color: colors.textSecondary,
+    color: "#94A3B8",
     fontWeight: "700",
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: webFont,
   },
-
   footerPlus: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     marginTop: -30,
+    borderWidth: 4,
+    borderColor: "#FAFAFC",
     ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.5, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } },
-      android: { elevation: 10 },
-      web: { boxShadow: "0 8px 24px rgba(124, 58, 237, 0.5)" },
-      default: { elevation: 10 },
+      ios: { shadowColor: "#7C3AED", shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
+      android: { elevation: 8 },
+      web: { boxShadow: "0 8px 24px rgba(124, 58, 237, 0.4)" },
     }),
   },
-
-  // ── Sidebar ───────────────────────────────────────────────────────────────
   sidebar: {
     position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
-    width: 260,
-    backgroundColor: colors.glassBg,
+    width: 280,
+    backgroundColor: "rgba(255,255,255,0.9)",
     padding: 24,
     borderTopRightRadius: 32,
     borderBottomRightRadius: 32,
     borderRightWidth: 1,
-    borderColor: colors.glassBorder,
+    borderColor: "rgba(124, 58, 237, 0.1)",
     ...Platform.select({
-      ios: { shadowColor: colors.primary, shadowOpacity: 0.2, shadowRadius: 32, shadowOffset: { width: 8, height: 0 } },
+      ios: { shadowColor: "#7C3AED", shadowOpacity: 0.15, shadowRadius: 32, shadowOffset: { width: 10, height: 0 } },
       android: { elevation: 16 },
-      web: { boxShadow: "8px 0 48px rgba(124, 58, 237, 0.18)", backdropFilter: "blur(20px)" },
-      default: { elevation: 16 },
+      web: { boxShadow: "10px 0 48px rgba(124, 58, 237, 0.1)", backdropFilter: "blur(20px)" },
     }),
     zIndex: 99999,
   },
-
   logoBox: {
     alignItems: "center",
-    marginBottom: 28,
+    marginBottom: 32,
+    paddingTop: 20,
   },
-
-  logoText: {
-    marginTop: 8,
-    fontSize: 28,
-    fontWeight: "800",
-    color: colors.primary,
-    fontFamily: displayFont,
-    letterSpacing: 2,
-  },
-
   sideItem: {
     height: 52,
     borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
-    marginBottom: 6,
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
-
   sideItemActive: {
-    backgroundColor: colors.primaryBg,
-    borderWidth: 1,
-    borderColor: colors.borderPrimary,
+    backgroundColor: "#F3E8FF",
   },
-
   sideText: {
-    marginLeft: 12,
-    fontSize: 14,
-    color: colors.textSecondary,
+    marginLeft: 14,
+    fontSize: 15,
+    color: "#64748B",
     fontWeight: "600",
-    fontFamily: webFont,
   },
-
   sideTextActive: {
     color: colors.primary,
     fontWeight: "800",
   },
-
-  // ── Reminder Card (bottom of sidebar) ────────────────────────────────────
   reminderCard: {
     marginTop: "auto" as any,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: colors.primaryBg,
+    padding: 20,
+    borderRadius: 24,
+    backgroundColor: "#F5F3FF",
     borderWidth: 1,
-    borderColor: colors.borderPrimary,
+    borderColor: "#EDE9FE",
   },
-
   reminderTitle: {
-    marginTop: 10,
+    marginTop: 12,
     color: colors.primary,
     fontWeight: "800",
-    fontFamily: displayFont,
+    fontSize: 16,
   },
-
   reminderText: {
     marginTop: 8,
-    color: colors.textSecondary,
-    lineHeight: 20,
+    color: "#64748B",
+    lineHeight: 22,
     fontSize: 13,
-    fontFamily: webFont,
+  },
+  row: {
+    flexDirection: "column",
+    gap: 16,
+    marginBottom: 16,
   },
 });

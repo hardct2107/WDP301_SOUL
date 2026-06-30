@@ -1,34 +1,25 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
+import { router } from "expo-router";
 
 export function EventCard() {
-  const openEvents = () => router.push("/user-events");
-
   return (
-    <View style={styles.panel}>
-      <View style={styles.panelHeader}>
-        <Text style={styles.panelTitle}>Upcoming Event</Text>
-        <TouchableOpacity onPress={openEvents}>
-          <Text style={styles.panelLink}>See all</Text>
-        </TouchableOpacity>
+    <View style={styles.eventCard}>
+      <View style={styles.eventImg}>
+        <MaterialCommunityIcons name="calendar-heart" size={64} color="#0F766E" />
       </View>
-
-      <View style={styles.communityWrap}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.eventTitle}>Mindfulness & Meditation Workshop</Text>
-          <Text style={styles.eventMeta}>View the latest SOUL event schedule</Text>
-          <Text style={styles.eventMeta}>Online and campus activities</Text>
-
-          <TouchableOpacity style={styles.joinButton} onPress={openEvents}>
-            <Text style={styles.joinText}>Browse Events</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.eventImage}>
-          <MaterialCommunityIcons name="meditation" size={92} color="#E58A1F" />
-        </View>
+      <View style={styles.eventContent}>
+        <Text style={styles.eventTitle}>Workshop: Quản lý căng thẳng & Burnout</Text>
+        <Text style={styles.eventMeta}>20:00 - Thứ Bảy, 15/10 • Online qua Zoom</Text>
+        
+        <TouchableOpacity
+          style={styles.joinButton}
+          activeOpacity={0.8}
+          onPress={() => router.push("/user-events")}
+        >
+          <Text style={styles.joinText}>Reserve Spot</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

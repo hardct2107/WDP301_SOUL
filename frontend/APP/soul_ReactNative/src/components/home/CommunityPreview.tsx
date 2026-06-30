@@ -1,44 +1,42 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
+import { router } from "expo-router";
 
 export function CommunityPreview() {
   return (
-    <View style={styles.panel}>
-      <View style={styles.panelHeader}>
-        <Text style={styles.panelTitle}>👥 Community Highlight</Text>
-        <Text style={styles.panelLink}>See all</Text>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={() => router.push("/(tabs)/forum")}
+      style={styles.communityCard}
+    >
+      <View style={styles.dashHeader}>
+        <Text style={styles.dashTitle}>Cộng đồng SOUL</Text>
+        <Text style={styles.dashLink}>Tham gia ngay</Text>
       </View>
 
-      <View style={styles.communityWrap}>
-        <View style={{ flex: 1 }}>
-          <View style={styles.userRow}>
-            <Image
-              source={{ uri: "https://i.pravatar.cc/100?img=32" }}
-              style={styles.smallAvatar}
-            />
-            <View>
-              <Text style={styles.userName}>
-                Linh Phạm <Text style={styles.newTag}>New</Text>
-              </Text>
-              <Text style={styles.time}>2h ago</Text>
-            </View>
-          </View>
-
-          <Text style={styles.postText}>
-            Grateful for a new day and a fresh start. Let’s be kind to ourselves today 💚
-          </Text>
-
-          <View style={styles.reactRow}>
-            <Text style={styles.reactText}>❤️ 24</Text>
-            <Text style={styles.reactText}>💬 6</Text>
-          </View>
-        </View>
-
-        <View style={styles.illustrationBox}>
-          <MaterialCommunityIcons name="account-group" size={92} color="#2A9D8F" />
+      <View style={styles.userRow}>
+        <View style={styles.smallAvatar} />
+        <View>
+          <Text style={styles.userName}>Minh Nhật</Text>
+          <Text style={styles.time}>2 giờ trước</Text>
         </View>
       </View>
-    </View>
+
+      <Text style={styles.postText}>
+        Hôm nay mình đã thử bài tập hít thở 5 phút trên SOUL. Thực sự cảm thấy nhẹ nhõm hơn rất nhiều sau một ngày dài làm việc căng thẳng. Cảm ơn mọi người đã chia sẻ tips này! 🌿
+      </Text>
+
+      <View style={styles.reactRow}>
+        <View style={styles.reactItem}>
+          <MaterialCommunityIcons name="heart-outline" size={16} color="#EF4444" />
+          <Text style={styles.reactText}>24</Text>
+        </View>
+        <View style={styles.reactItem}>
+          <MaterialCommunityIcons name="comment-outline" size={16} color="#64748B" />
+          <Text style={styles.reactText}>5</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }
