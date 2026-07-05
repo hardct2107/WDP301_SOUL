@@ -24,6 +24,7 @@ const adminRoutes = require("./src/routes/adminRoutes");
 const emotionalTestRoutes = require("./src/routes/emotionalTestRoutes");
 const ratingRoutes = require("./src/routes/ratingRoutes");
 const adminRatingRoutes = require("./src/routes/adminRatingRoutes");
+const notificationRoutes = require("./src/routes/notificationRoutes");
 
 const app = express();
 
@@ -104,5 +105,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/emotional-tests", emotionalTestRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/admin/ratings", adminRatingRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 module.exports = app;

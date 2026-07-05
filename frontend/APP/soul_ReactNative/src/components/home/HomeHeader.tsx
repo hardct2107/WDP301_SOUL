@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
   Pressable,
@@ -12,6 +11,8 @@ import { router } from "expo-router";
 import { useAuthStore } from "@/store";
 import { styles } from "@/styles/home.styles";
 import { ProfileModals } from "./ProfileModals";
+import { NotificationDropdown } from "./NotificationDropdown";
+import { getUnreadCount } from "@/api/notificationApi";
 
 type Props = {
   showSidebar: boolean;
@@ -19,12 +20,38 @@ type Props = {
   webMode?: boolean;
 };
 
+const POLL_INTERVAL = 30_000; // 30 giây
+
 export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Props) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user, logout } = useAuthStore();
 
   const [showMyProfile, setShowMyProfile] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+
+  // ── Fetch unread count ──────────────────────────────────────────────────
+  const fetchUnread = useCallback(async () => {
+    try {
+      const count = await getUnreadCount();
+      setUnreadCount(count);
+    } catch {
+      /* silent */
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUnread();
+    const interval = setInterval(fetchUnread, POLL_INTERVAL);
+    return () => clearInterval(interval);
+  }, [fetchUnread]);
+
+  // Khi đóng dropdown → cập nhật lại số unread
+  const handleCloseNotifications = () => {
+    setShowNotifications(false);
+    fetchUnread();
+  };
 
   const handleActionPress = (text: string) => {
     if (text === "Log out") {
@@ -56,16 +83,25 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
 
       {/* Right side: Notification & Avatar */}
       <View style={styles.headerRight}>
-        <View style={styles.bellWrap}>
+        {/* Bell */}
+        <TouchableOpacity
+          style={styles.bellWrap}
+          onPress={() => setShowNotifications(!showNotifications)}
+          activeOpacity={0.75}
+        >
           <MaterialCommunityIcons
-            name="bell-outline"
+            name={showNotifications ? "bell" : "bell-outline"}
             size={22}
-            color="#475569"
+            color={showNotifications ? "#7C3AED" : "#475569"}
           />
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>3</Text>
-          </View>
-        </View>
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <Pressable
           style={styles.profileWrapper}
@@ -118,6 +154,12 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
           )}
         </Pressable>
       </View>
+
+      {/* Notification dropdown / sheet */}
+      <NotificationDropdown
+        visible={showNotifications}
+        onClose={handleCloseNotifications}
+      />
 
       <ProfileModals
         showMyProfile={showMyProfile}

@@ -3,7 +3,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
 
-export function HeroCard() {
+type Props = {
+  onStartChat?: () => void;
+};
+
+export function HeroCard({ onStartChat }: Props) {
   return (
     <View style={styles.heroContainer}>
       <LinearGradient
@@ -26,7 +30,7 @@ export function HeroCard() {
         </Text>
 
         <View style={styles.heroButtons}>
-          <TouchableOpacity style={{ flex: 1 }} activeOpacity={0.8}>
+          <TouchableOpacity style={{ flex: 1 }} activeOpacity={0.8} onPress={onStartChat}>
             <LinearGradient
               colors={["#7C3AED", "#A855F7"]}
               start={{ x: 0, y: 0 }}
