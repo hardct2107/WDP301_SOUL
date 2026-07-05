@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Platform, ScrollView, View, SafeAreaView } from "react-native";
+import { Platform, ScrollView, View, SafeAreaView, StyleSheet } from "react-native";
 import { styles, webStyles } from "@/styles/home.styles";
 
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { HeroCard } from "@/components/home/HeroCard";
-import { ChatDemo } from "@/components/home/ChatDemo";
 import { StatsSection } from "@/components/home/StatsSection";
 import { DailyMotivation } from "@/components/home/DailyMotivation";
 import { MiniArticle } from "@/components/home/MiniArticle";
@@ -16,28 +15,23 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { Pricing } from "@/components/home/Pricing";
 import { CtaFooter } from "@/components/home/CtaFooter";
 import { BottomNav } from "@/components/home/BottomNav";
-import { Sidebar } from "@/components/home/Sidebar";
 import { RatingModal } from "@/components/home/RatingModal";
+import { FloatingChat } from "@/components/home/FloatingChat";
 
 const isWeb = Platform.OS === "web";
 
 export default function HomeScreen() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showRating, setShowRating] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   if (isWeb) {
-    // ── Web Dashboard Layout ──────────────────────────────────────────────
+    // ── Web Layout ─────────────────────────────────────────────────────────
     return (
       <View style={webStyles.root}>
-        {/* Sidebar cố định bên trái */}
-        <View style={webStyles.sidebarCol}>
-          <Sidebar />
-        </View>
-
-        {/* Main content area */}
         <ScrollView
           style={webStyles.contentArea}
-          contentContainerStyle={{ paddingBottom: 48 }}
+          contentContainerStyle={{ paddingBottom: 64 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Topbar */}
@@ -47,22 +41,26 @@ export default function HomeScreen() {
             webMode
           />
 
-          <View style={{ maxWidth: 900, alignSelf: "center", width: "100%", paddingTop: 20 }}>
-            {/* Assembly of components */}
-            <HeroCard />
-            <ChatDemo />
+          <View style={localWebStyles.pageWrapper}>
+            <HeroCard onStartChat={() => setChatOpen(true)} />
             <StatsSection />
             <DailyMotivation />
-            <MiniArticle />
-            <HealingSection />
             <DashboardPreview />
-            <CommunityPreview />
             <EventCard />
+            <MiniArticle />
+            <CommunityPreview />
+            <HealingSection />
             <Testimonials />
             <Pricing />
             <CtaFooter />
           </View>
         </ScrollView>
+
+        {/* Floating Chat Widget — cố định góc phải dưới */}
+        <FloatingChat
+          defaultOpen={chatOpen}
+          onOpenChange={(o) => { if (!o) setChatOpen(false); }}
+        />
 
         {/* Rating popup */}
         <RatingModal
@@ -73,11 +71,9 @@ export default function HomeScreen() {
     );
   }
 
-  // ── Mobile Layout ────────────────────────────────────────────────────────
+  // ── Mobile Layout ──────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.page}>
-      {showSidebar && <Sidebar />}
-
       <HomeHeader
         showSidebar={showSidebar}
         onToggleSidebar={() => setShowSidebar(!showSidebar)}
@@ -85,7 +81,6 @@ export default function HomeScreen() {
 
       <ScrollView style={styles.main} showsVerticalScrollIndicator={false}>
         <HeroCard />
-        <ChatDemo />
         <StatsSection />
         <DailyMotivation />
         <MiniArticle />
@@ -99,6 +94,12 @@ export default function HomeScreen() {
         <BottomNav onRatingPress={() => setShowRating(true)} />
       </ScrollView>
 
+      {/* FAB chat nằm trên BottomNav */}
+      <FloatingChat
+        defaultOpen={chatOpen}
+        onOpenChange={(o) => { if (!o) setChatOpen(false); }}
+      />
+
       <RatingModal
         forceVisible={showRating}
         onForceClose={() => setShowRating(false)}
@@ -106,3 +107,12 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
+const localWebStyles = StyleSheet.create({
+  pageWrapper: {
+    maxWidth: 1400,
+    alignSelf: "center",
+    width: "100%",
+    paddingTop: 16,
+  },
+});

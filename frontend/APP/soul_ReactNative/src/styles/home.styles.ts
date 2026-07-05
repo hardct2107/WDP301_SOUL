@@ -180,9 +180,12 @@ export const styles = StyleSheet.create({
     fontFamily: webFont,
   },
   heroContainer: {
-    paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 32,
+    ...Platform.select({
+      web: { paddingHorizontal: 40 },
+      default: { paddingHorizontal: 20 },
+    }),
   },
   heroCard: {
     minHeight: 380,
@@ -270,11 +273,14 @@ export const styles = StyleSheet.create({
   chatDemoCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 28,
-    marginHorizontal: 20,
     marginBottom: 32,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(124, 58, 237, 0.05)",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
     ...cardShadow,
   },
   chatDemoHeader: {
@@ -389,8 +395,11 @@ export const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
     marginBottom: 32,
+    ...Platform.select({
+      web: { paddingHorizontal: 40 },
+      default: { paddingHorizontal: 24 },
+    }),
   },
   statItem: {
     alignItems: "center",
@@ -410,7 +419,6 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   motivationCard: {
-    marginHorizontal: 20,
     marginBottom: 32,
     borderRadius: 24,
     padding: 24,
@@ -418,6 +426,10 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     overflow: "hidden",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
   },
   motivationTextWrap: {
     flex: 1,
@@ -445,13 +457,16 @@ export const styles = StyleSheet.create({
     fontSize: 13,
   },
   articleCard: {
-    marginHorizontal: 20,
     marginBottom: 32,
     backgroundColor: "#FFFFFF",
     borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.03)",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
     ...cardShadow,
   },
   articleImgMock: {
@@ -512,8 +527,11 @@ export const styles = StyleSheet.create({
   healingGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingHorizontal: 14,
     marginBottom: 32,
+    ...Platform.select({
+      web: { paddingHorizontal: 34 },
+      default: { paddingHorizontal: 14 },
+    }),
   },
   healingCardWrapper: {
     width: "50%",
@@ -547,13 +565,16 @@ export const styles = StyleSheet.create({
     opacity: 0.8,
   },
   dashCard: {
-    marginHorizontal: 20,
     marginBottom: 32,
     backgroundColor: "#FFFFFF",
     borderRadius: 28,
     padding: 24,
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.03)",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
     ...cardShadow,
   },
   dashHeader: {
@@ -614,11 +635,14 @@ export const styles = StyleSheet.create({
     lineHeight: 22,
   },
   communityCard: {
-    marginHorizontal: 20,
     marginBottom: 32,
     backgroundColor: "#FFFFFF",
     borderRadius: 28,
     padding: 24,
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
     ...cardShadow,
   },
   userRow: {
@@ -668,11 +692,14 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
   eventCard: {
-    marginHorizontal: 20,
     marginBottom: 32,
     backgroundColor: "#FFFFFF",
     borderRadius: 28,
     overflow: "hidden",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
     ...cardShadow,
   },
   eventImg: {
@@ -707,8 +734,11 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
   testiScroll: {
-    paddingHorizontal: 20,
     paddingBottom: 32,
+    ...Platform.select({
+      web: { paddingHorizontal: 40 },
+      default: { paddingHorizontal: 20 },
+    }),
   },
   testiCard: {
     width: 280,
@@ -752,9 +782,12 @@ export const styles = StyleSheet.create({
   },
   pricingRow: {
     flexDirection: "row",
-    paddingHorizontal: 20,
     marginBottom: 32,
     gap: 16,
+    ...Platform.select({
+      web: { paddingHorizontal: 40 },
+      default: { paddingHorizontal: 20 },
+    }),
   },
   priceCard: {
     flex: 1,
@@ -840,12 +873,15 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   ctaSection: {
-    marginHorizontal: 20,
     marginBottom: 32,
     borderRadius: 32,
     padding: 32,
     alignItems: "center",
     overflow: "hidden",
+    ...Platform.select({
+      web: { marginHorizontal: 40 },
+      default: { marginHorizontal: 20 },
+    }),
   },
   ctaTitle: {
     fontSize: 28,

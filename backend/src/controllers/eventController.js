@@ -5,6 +5,7 @@ const EventRating = require("../models/EventRating");
 const EventRegistration = require("../models/EventRegistration");
 const EventAttendanceAudit = require("../models/EventAttendanceAudit");
 const EventRegistrationMutex = require("../models/EventRegistrationMutex");
+const { createNotification } = require("../services/notificationService");
 const {
   buildEventStatusQuery,
   getEffectiveEventStatus,
@@ -824,6 +825,15 @@ const registerEvent = async (req, res) => {
     );
     seatReserved = false;
 
+    // Gửi thông báo đăng ký thành công
+    createNotification(
+      userId,
+      "event_registration",
+      "Đăng ký sự kiện thành công 🎟️",
+      `Bạn đã đăng ký tham gia sự kiện "${reservedEvent.title}" thành công. Hẹn gặp bạn tại sự kiện!`,
+      { type: "Event", id: reservedEvent._id }
+    );
+
     return res.status(existingRegistration ? 200 : 201).json({
       success: true,
       message: "Đăng ký sự kiện thành công",
@@ -899,6 +909,15 @@ const cancelRegistration = async (req, res) => {
       );
       throw new ControllerError(409, "Registration counter is inconsistent");
     }
+
+    // Gửi thông báo hủy đăng ký
+    createNotification(
+      userId,
+      "event_reminder",
+      "Hủy đăng ký sự kiện",
+      `Bạn đã hủy đăng ký sự kiện "${event.title}". Bạn có thể đăng ký lại bất cứ lúc nào nếu đổi ý.`,
+      { type: "Event", id: event._id }
+    );
 
     return res.status(200).json({
       success: true,

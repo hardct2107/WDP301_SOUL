@@ -12,6 +12,7 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       enum: [
         "event_reminder",
+        "event_registration",
         "mental_insight",
         "safety_alert",
         "report_update",
@@ -20,6 +21,7 @@ const notificationSchema = new mongoose.Schema(
         "positive_support_request",
         "friend_suggestion",
         "friend_request",
+        "welcome",
         "system",
       ],
       required: true,

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const User = require("../models/User");
 const TokenBlacklist = require("../models/TokenBlacklist");
+const { createNotification } = require("../services/notificationService");
 
 // Generate JWT Helper
 const generateToken = (userId) => {
@@ -94,7 +95,15 @@ const register = async (req, res) => {
     // 8. Tạo JWT token
     const token = generateToken(newUser._id);
 
-    // 9. Trả về kết quả (toJSON đã tự động xóa passwordHash)
+    // 9. Gửi thông báo chào mừng (không chặn response nếu lỗi)
+    createNotification(
+      newUser._id,
+      "welcome",
+      "Chào mừng bạn đến với SOUL! 🎉",
+      `Xin chào ${newUser.fullName}! Hành trình chăm sóc sức khỏe tâm thần của bạn bắt đầu từ đây. Hãy khám phá các tính năng của SOUL nhé.`
+    );
+
+    // 10. Trả về kết quả (toJSON đã tự động xóa passwordHash)
     return res.status(201).json({
       success: true,
       message: "Đăng ký tài khoản thành công.",
@@ -160,6 +169,14 @@ const login = async (req, res) => {
 
     // 6. Tạo JWT token
     const token = generateToken(user._id);
+
+    // 7. Thông báo đăng nhập thành công
+    createNotification(
+      user._id,
+      "system",
+      "Đăng nhập thành công",
+      `Chào mừng trở lại, ${user.fullName}! Bạn vừa đăng nhập lúc ${new Date().toLocaleTimeString("vi-VN")}.`
+    );
 
     return res.status(200).json({
       success: true,
