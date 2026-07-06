@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
   adminRatingService,
@@ -309,21 +310,26 @@ export default function AdminRatingsScreen() {
         </View>
       )}
 
-      <View style={styles.headerShell}>
+      <LinearGradient
+        colors={["#D97706", "#F59E0B"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerShell}
+      >
         <View style={styles.headerContent}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <MaterialCommunityIcons name="arrow-left" size={20} color="#0F172A" />
+            <MaterialCommunityIcons name="arrow-left" size={20} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerCopy}>
-            <Text style={styles.headerTitle}>Quản lý đánh giá</Text>
-            <Text style={styles.headerSubtitle}>Phản hồi từ người tham dự sự kiện</Text>
+            <Text style={[styles.headerTitle, { color: "#fff" }]}>Quản lý đánh giá</Text>
+            <Text style={[styles.headerSubtitle, { color: "rgba(255,255,255,0.9)" }]}>Phản hồi từ người tham dự sự kiện</Text>
           </View>
-          <TouchableOpacity style={styles.exportButton} onPress={exportCsv}>
-            <MaterialCommunityIcons name="download-outline" size={18} color="#0F172A" />
-            {!compact && <Text style={styles.exportText}>Xuất CSV</Text>}
+          <TouchableOpacity style={[styles.exportButton, { backgroundColor: "rgba(255,255,255,0.2)", borderColor: "transparent" }]} onPress={exportCsv}>
+            <MaterialCommunityIcons name="download-outline" size={18} color="#fff" />
+            {!compact && <Text style={[styles.exportText, { color: "#fff" }]}>Xuất CSV</Text>}
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <FlatList
         data={ratings}

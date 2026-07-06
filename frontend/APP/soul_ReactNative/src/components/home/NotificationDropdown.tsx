@@ -25,7 +25,7 @@ const webFont = Platform.select({
 });
 
 // ─── Inject web animation CSS ────────────────────────────────────────────────
-if (Platform.OS === "web") {
+if (Platform.OS === "web" && typeof document !== "undefined") {
   const s = document.createElement("style");
   s.innerHTML = `
     @keyframes notif-slide-in {

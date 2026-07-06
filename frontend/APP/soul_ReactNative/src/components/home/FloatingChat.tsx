@@ -31,7 +31,7 @@ const displayFont = Platform.select({
 });
 
 // ─── Web-only injected CSS for animations ────────────────────────────────────
-if (Platform.OS === "web") {
+if (Platform.OS === "web" && typeof document !== "undefined") {
   const style = document.createElement("style");
   style.innerHTML = `
     @keyframes soul-fade-in {

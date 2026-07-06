@@ -15,6 +15,7 @@ import {
   Modal,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
   getAdminUsers,
@@ -248,13 +249,18 @@ export default function AdminUsersScreen() {
       )}
 
       {/* Header */}
-      <View style={styles.header}>
+      <LinearGradient
+        colors={["#8B5CF6", "#3B82F6"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <MaterialCommunityIcons name="arrow-left" size={22} color={colors.dark} />
+          <MaterialCommunityIcons name="arrow-left" size={22} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Quản lý Người dùng</Text>
+        <Text style={[styles.headerTitle, { color: "#fff" }]}>Quản lý Người dùng</Text>
         <View style={{ width: 40 }} />
-      </View>
+      </LinearGradient>
 
       {/* Stats row */}
       <View style={styles.statsRow}>

@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -309,7 +310,12 @@ export default function AdminForumScreen() {
 
   return (
     <View style={s.page}>
-      <View style={s.header}>
+      <LinearGradient
+        colors={["#14B8A6", "#0ea5e9"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={s.header}
+      >
         <View style={s.headerTop}>
           <Pressable
             style={s.backButton}
@@ -327,9 +333,9 @@ export default function AdminForumScreen() {
           </View>
         </View>
 
-        <Text style={s.title}>Forum Moderation</Text>
+        <Text style={[s.title, { color: "#fff" }]}>Forum Moderation</Text>
 
-        <Text style={s.subtitle}>
+        <Text style={[s.subtitle, { color: "rgba(255,255,255,0.85)" }]}>
           Review community posts, handle reports, and keep SOUL forum safe.
         </Text>
 
@@ -414,7 +420,7 @@ export default function AdminForumScreen() {
             );
           })}
         </ScrollView>
-      </View>
+      </LinearGradient>
 
       <FlatList
         data={visiblePosts}
