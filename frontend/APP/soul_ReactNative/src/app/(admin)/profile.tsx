@@ -15,6 +15,7 @@ import {
   Platform,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useAuthStore } from "@/store";
 import { colors } from "@/constants/colors";
@@ -171,7 +172,12 @@ export default function AdminProfile() {
       >
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Admin Info Banner */}
-          <View style={styles.profileBanner}>
+          <LinearGradient
+            colors={["#8B5CF6", "#3B82F6"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.profileBanner}
+          >
             <View style={styles.avatarWrapper}>
               <Image
                 source={{
@@ -183,9 +189,9 @@ export default function AdminProfile() {
                 <MaterialCommunityIcons name="shield-check" size={16} color="#FFFFFF" />
               </View>
             </View>
-            <Text style={styles.adminNameText}>{user?.fullName || "Quản trị viên"}</Text>
-            <Text style={styles.adminRoleText}>Tài khoản: {user?.email || "admin@soul.com"}</Text>
-          </View>
+            <Text style={[styles.adminNameText, { color: "#fff" }]}>{user?.fullName || "Quản trị viên"}</Text>
+            <Text style={[styles.adminRoleText, { color: "rgba(255,255,255,0.85)" }]}>Tài khoản: {user?.email || "admin@soul.com"}</Text>
+          </LinearGradient>
 
           {/* Navigation Tab buttons */}
           <View style={styles.tabContainer}>

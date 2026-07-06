@@ -11,6 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useAuthStore } from "@/store";
 import { colors } from "@/constants/colors";
@@ -74,36 +75,42 @@ export default function AdminDashboard() {
       value: String(eventStats.registeredCount),
       icon: "account-check",
       color: "#14B8A6",
+      grad: ["#F0FDFA", "#CCFBF1"],
     },
     {
       label: "Cancelled",
       value: String(eventStats.cancelledCount),
       icon: "account-cancel",
       color: "#EF4444",
+      grad: ["#FEF2F2", "#FEE2E2"],
     },
     {
-      label: "Attended / Absent",
+      label: "Attended/Absent",
       value: `${eventStats.attendedCount} / ${eventStats.absentCount}`,
       icon: "account-star",
       color: "#F59E0B",
+      grad: ["#FFFBEB", "#FEF3C7"],
     },
     {
       label: "Attendance rate",
       value: `${eventStats.attendanceRate}%`,
       icon: "chart-donut",
       color: "#3B82F6",
+      grad: ["#EFF6FF", "#DBEAFE"],
     },
     {
       label: "Review rate",
       value: `${eventStats.reviewRate}%`,
       icon: "message-star-outline",
       color: "#8B5CF6",
+      grad: ["#F5F3FF", "#EDE9FE"],
     },
     {
       label: "Average rating",
       value: eventStats.averageRating.toFixed(1),
       icon: "star",
       color: "#F59E0B",
+      grad: ["#FFFBEB", "#FEF3C7"],
     },
   ];
 
@@ -113,20 +120,23 @@ export default function AdminDashboard() {
       description: "Xem, chặn, phân quyền tài khoản người dùng",
       icon: "account-cog",
       color: colors.dark,
+      grad: ["#F8FAFC", "#E2E8F0"],
       route: "/(admin)/users",
     },
     {
       title: "Quản lý Forum",
       description: "Kiểm duyệt bài viết, xử lý báo cáo và ẩn nội dung vi phạm",
       icon: "forum-outline",
-      color: "#14B8A6",
+      color: "#0D9488",
+      grad: ["#F0FDFA", "#CCFBF1"],
       route: "/(admin)/forum",
     },
     {
       title: "Xem Báo cáo Nội dung",
       description: "Xét duyệt và xử lý các bài đăng bị báo cáo vi phạm",
       icon: "shield-alert",
-      color: "#EF4444",
+      color: "#E11D48",
+      grad: ["#FFF1F2", "#FFE4E6"],
       route: "/(admin)/forum",
     },
     {
@@ -134,20 +144,23 @@ export default function AdminDashboard() {
       description: "Tạo và điều phối các workshop/talkshow tâm lý",
       icon: "calendar-star",
       color: colors.darkTeal,
+      grad: ["#E6FFFA", "#B2F5EA"],
       route: "/(admin)/events",
     },
     {
       title: "Đánh giá sự kiện",
       description: "Xem thống kê, kiểm duyệt và xuất phản hồi người tham dự",
       icon: "message-star-outline",
-      color: "#F59E0B",
+      color: "#D97706",
+      grad: ["#FFFBEB", "#FEF3C7"],
       route: "/(admin)/ratings",
     },
     {
       title: "Cấu hình Hệ thống AI",
       description: "Tùy chỉnh mô hình LLM và độ nhạy an toàn",
       icon: "cog",
-      color: "#6B7280",
+      color: "#475569",
+      grad: ["#F8FAFC", "#F1F5F9"],
       onPress: () =>
         Alert.alert("Thông báo", "Tính năng đang được hoàn thiện."),
     },
@@ -188,7 +201,12 @@ export default function AdminDashboard() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.banner}>
+        <LinearGradient
+          colors={["#8B5CF6", "#3B82F6"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.banner}
+        >
           <View style={styles.bannerInfo}>
             <Text style={styles.bannerTitle}>Hệ Thống Quản Trị SOUL</Text>
             <Text style={styles.bannerSub}>
@@ -199,28 +217,27 @@ export default function AdminDashboard() {
           <MaterialCommunityIcons
             name="shield-crown"
             size={60}
-            color="#FFFFFF"
-            style={styles.bannerIcon}
+            color="rgba(255,255,255,0.9)"
           />
-        </View>
+        </LinearGradient>
 
         <Text style={styles.sectionTitle}>Chỉ số Hệ thống</Text>
 
         <View style={styles.statsGrid}>
           {stats.map((stat, idx) => (
             <View key={idx} style={styles.statCard}>
-              <View
-                style={[
-                  styles.statIconContainer,
-                  { backgroundColor: stat.color + "15" },
-                ]}
+              <LinearGradient
+                colors={stat.grad as [string, string]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.statIconContainer}
               >
                 <MaterialCommunityIcons
                   name={stat.icon as any}
                   size={24}
                   color={stat.color}
                 />
-              </View>
+              </LinearGradient>
 
               <Text style={styles.statValue}>{stat.value}</Text>
               <Text style={styles.statLabel}>{stat.label}</Text>
@@ -237,18 +254,18 @@ export default function AdminDashboard() {
             activeOpacity={0.8}
             onPress={() => handleActionPress(action)}
           >
-            <View
-              style={[
-                styles.actionIconContainer,
-                { backgroundColor: action.color + "12" },
-              ]}
+            <LinearGradient
+              colors={action.grad as [string, string]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.actionIconContainer}
             >
               <MaterialCommunityIcons
                 name={action.icon as any}
                 size={26}
                 color={action.color}
               />
-            </View>
+            </LinearGradient>
 
             <View style={styles.actionInfo}>
               <Text style={styles.actionTitle}>{action.title}</Text>
