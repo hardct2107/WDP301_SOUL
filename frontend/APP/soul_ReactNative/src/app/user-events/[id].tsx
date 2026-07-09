@@ -790,15 +790,31 @@ const screenStyles = StyleSheet.create({
   },
   content: {
     width: "100%",
-    maxWidth: 1180,
+    maxWidth: 1240,
     alignSelf: "center",
-    padding: 16,
+    padding: 18,
     paddingBottom: 120,
+    ...Platform.select({
+      web: {
+        paddingHorizontal: 30,
+        paddingTop: 24,
+      },
+      default: {},
+    }),
   },
   heroCard: {
-    borderRadius: 24,
-    padding: 20,
-    backgroundColor: "#006B5C",
+    borderRadius: 32,
+    padding: 24,
+    backgroundColor: colors.primary,
+    overflow: "hidden",
+    ...Platform.select({
+      web: {
+        minHeight: 260,
+        padding: 34,
+        boxShadow: "0 24px 60px rgba(124, 58, 237, 0.16)",
+      },
+      default: {},
+    }),
   },
   heroTop: {
     flexDirection: "row",
@@ -821,7 +837,15 @@ const screenStyles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 35,
     fontWeight: "900",
-    fontFamily: "Georgia",
+    ...Platform.select({
+      web: {
+        maxWidth: 860,
+        fontSize: 42,
+        lineHeight: 50,
+        letterSpacing: -0.8,
+      },
+      default: { fontFamily: "Georgia" },
+    }),
   },
   eventDescription: {
     marginTop: 12,
@@ -829,6 +853,14 @@ const screenStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     lineHeight: 22,
+    ...Platform.select({
+      web: {
+        maxWidth: 780,
+        fontSize: 15,
+        lineHeight: 25,
+      },
+      default: {},
+    }),
   },
   statsRow: {
     marginTop: 14,
@@ -842,7 +874,16 @@ const screenStyles = StyleSheet.create({
     padding: 12,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E5F3EF",
+    borderColor: "#F1F5F9",
+    ...Platform.select({
+      web: {
+        minHeight: 104,
+        borderRadius: 22,
+        padding: 16,
+        boxShadow: "0 12px 28px rgba(15, 23, 42, 0.04)",
+      },
+      default: {},
+    }),
   },
   statValue: {
     marginTop: 8,
@@ -858,11 +899,18 @@ const screenStyles = StyleSheet.create({
   },
   progressCard: {
     marginTop: 14,
-    borderRadius: 18,
+    borderRadius: 24,
     padding: 16,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E5F3EF",
+    borderColor: "#F1F5F9",
+    ...Platform.select({
+      web: {
+        padding: 20,
+        boxShadow: "0 12px 28px rgba(15, 23, 42, 0.04)",
+      },
+      default: {},
+    }),
   },
   progressHeader: {
     flexDirection: "row",
@@ -885,7 +933,7 @@ const screenStyles = StyleSheet.create({
     height: 10,
     marginTop: 10,
     borderRadius: 999,
-    backgroundColor: "#DFF7EF",
+    backgroundColor: "#EDE9FE",
     overflow: "hidden",
   },
   progressFill: {
@@ -900,8 +948,8 @@ const screenStyles = StyleSheet.create({
     fontWeight: "800",
   },
   detailLayout: {
-    marginTop: 14,
-    gap: 14,
+    marginTop: 18,
+    gap: 18,
   },
   detailLayoutDesktop: {
     flexDirection: "row",
@@ -917,27 +965,35 @@ const screenStyles = StyleSheet.create({
     gap: 12,
   },
   sidebarDesktop: {
-    width: 300,
+    width: 330,
     flexShrink: 0,
     alignSelf: "flex-start",
     position: "sticky" as any,
-    top: 16,
+    top: 18,
   },
   infoCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 16,
+    borderRadius: 26,
+    padding: 20,
     borderWidth: 1,
-    borderColor: "#E5F3EF",
+    borderColor: "#F1F5F9",
     gap: 13,
+    ...Platform.select({
+      web: { boxShadow: "0 14px 34px rgba(15, 23, 42, 0.05)" },
+      default: {},
+    }),
   },
   sidebarCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 15,
+    borderRadius: 24,
+    padding: 18,
     borderWidth: 1,
-    borderColor: "#E5F3EF",
+    borderColor: "#F1F5F9",
     gap: 12,
+    ...Platform.select({
+      web: { boxShadow: "0 14px 34px rgba(15, 23, 42, 0.05)" },
+      default: {},
+    }),
   },
   sectionEyebrow: {
     color: "#64748B",
@@ -981,7 +1037,7 @@ const screenStyles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E5FBF4",
+    backgroundColor: "#F3E8FF",
   },
   infoTextWrap: {
     flex: 1,
@@ -1015,7 +1071,7 @@ const screenStyles = StyleSheet.create({
   },
   ratingButton: {
     minHeight: 44,
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.primary,
     flexDirection: "row",
@@ -1034,7 +1090,7 @@ const screenStyles = StyleSheet.create({
   },
   shareButton: {
     minHeight: 44,
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: "#CBD5E1",
     flexDirection: "row",
@@ -1062,7 +1118,7 @@ const screenStyles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E5FBF4",
+    backgroundColor: "#F3E8FF",
   },
   relatedCopy: { flex: 1, minWidth: 0 },
   relatedTitle: { color: colors.dark, fontSize: 12, lineHeight: 17, fontWeight: "800" },
@@ -1076,7 +1132,15 @@ const screenStyles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: "#E5F3EF",
+    borderTopColor: "#EDE9FE",
+    ...Platform.select({
+      web: {
+        paddingHorizontal: 30,
+        backgroundColor: "rgba(255, 255, 255, 0.92)",
+        backdropFilter: "blur(16px)",
+      } as any,
+      default: {},
+    }),
   },
   closedFooter: {
     width: "100%",
@@ -1093,12 +1157,21 @@ const screenStyles = StyleSheet.create({
   footerEndDate: { color: "#64748B", fontSize: 12, textAlign: "right" },
   primaryButton: {
     minHeight: 52,
-    borderRadius: 15,
+    borderRadius: 999,
     backgroundColor: colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    maxWidth: 1148,
+    width: "100%",
+    alignSelf: "center",
+    ...Platform.select({
+      web: {
+        boxShadow: "0 14px 34px rgba(124, 58, 237, 0.18)",
+      },
+      default: {},
+    }),
   },
   cancelButton: {
     backgroundColor: "#EF4444",

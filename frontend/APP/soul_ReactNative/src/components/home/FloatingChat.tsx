@@ -32,8 +32,11 @@ const displayFont = Platform.select({
 
 // ─── Web-only injected CSS for animations ────────────────────────────────────
 if (Platform.OS === "web" && typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.innerHTML = `
+  const styleId = "soul-floating-chat-styles";
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.innerHTML = `
     @keyframes soul-fade-in {
       from { opacity: 0; transform: scale(0.92) translateY(16px); }
       to   { opacity: 1; transform: scale(1)    translateY(0); }
@@ -51,7 +54,8 @@ if (Platform.OS === "web" && typeof document !== "undefined") {
     .soul-fab:hover { transform: scale(1.08); }
     .soul-fab { transition: transform 0.18s ease; }
   `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
+  }
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────

@@ -1,24 +1,28 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Platform,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { router, useLocalSearchParams } from "expo-router";
+
 import {
-  getEmotionalTestQuestions,
-  submitEmotionalTest,
-  EmotionalQuestion,
   AnswerOption,
   EmotionalAnswer,
+  EmotionalQuestion,
+  getEmotionalTestQuestions,
+  submitEmotionalTest,
   TestType,
 } from "../../api/emotionalTestApi";
-import { router, useLocalSearchParams } from "expo-router";
+
 type Props = {
   route?: {
     params?: {
@@ -30,6 +34,8 @@ type Props = {
 
 export default function EmotionalAssessmentScreen({ navigation }: Props) {
   const params = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
 
   const testType = Array.isArray(params.testType)
     ? (params.testType[0] as TestType)
@@ -46,6 +52,7 @@ export default function EmotionalAssessmentScreen({ navigation }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const totalAnswered = useMemo(() => Object.keys(answers).length, [answers]);
+  const progress = questions.length ? totalAnswered / questions.length : 0;
 
   useEffect(() => {
     loadQuestions();
@@ -95,11 +102,11 @@ export default function EmotionalAssessmentScreen({ navigation }: Props) {
       const result = await submitEmotionalTest(testType, payload);
 
       router.push({
-  pathname: "/emotional-test/result" as any,
-  params: {
-    result: JSON.stringify(result),
-  },
-});
+        pathname: "/emotional-test/result" as any,
+        params: {
+          result: JSON.stringify(result),
+        },
+      });
     } catch (error: any) {
       Alert.alert("Lỗi", error.message || "Không thể nộp bài kiểm tra.");
     } finally {
@@ -109,125 +116,115 @@ export default function EmotionalAssessmentScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <LinearGradient colors={["#BFD7FF", "#D9C2FF"]} style={styles.loadingBox}>
-        <ActivityIndicator size="large" color="#7B61FF" />
+      <LinearGradient colors={["#F8F5FF", "#FFFFFF", "#F0FDFA"]} style={styles.loadingBox}>
+        <ActivityIndicator size="large" color="#7C3AED" />
         <Text style={styles.loadingText}>Đang tải câu hỏi...</Text>
       </LinearGradient>
     );
   }
 
   return (
-    <LinearGradient colors={["#BFD7FF", "#D9C2FF"]} style={styles.container}>
+    <LinearGradient colors={["#F8F5FF", "#FFFFFF", "#F0FDFA"]} style={styles.container}>
       <SafeAreaView style={styles.safe}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <View style={styles.topBar}>
             <TouchableOpacity
-  style={styles.backButton}
-        onPress={() => router.replace("/(tabs)" as any)}
->
-  <Text style={styles.backText}>‹</Text>
-</TouchableOpacity>
+              style={styles.backButton}
+              onPress={() => router.replace("/emotional-test" as any)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.backText}>‹</Text>
+            </TouchableOpacity>
 
-            <Text style={styles.title}>{title}</Text>
-
-            <View style={{ width: 38 }} />
-          </View>
-
-          <View style={styles.heroBox}>
-            <Text style={styles.heroIcon}>
-              {testType === "WHO5" ? "🧘‍♀️" : "📘"}
-            </Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <View style={styles.infoHeader}>
-              <View style={styles.infoIconCircle}>
-                <Text style={styles.infoIcon}>i</Text>
-              </View>
-              <Text style={styles.infoTitle}>HOW TO PROCEED</Text>
-            </View>
-
-            <Text style={styles.infoText}>{description}</Text>
-
-            <Text style={styles.sourceText}>{source}</Text>
-
-            <Text style={styles.disclaimer}>{disclaimer}</Text>
-          </View>
-
-          {questions.map((question, index) => (
-            <View key={question.id} style={styles.questionCard}>
-              <View style={styles.questionHeader}>
-                <View
-                  style={[
-                    styles.numberBox,
-                    index % 3 === 1 && styles.numberBoxBlue,
-                    index % 3 === 2 && styles.numberBoxOrange,
-                  ]}
-                >
-                  <Text style={styles.numberText}>{index + 1}</Text>
-                </View>
-
-                <Text style={styles.questionText}>{question.text}</Text>
-              </View>
-
-              {question.reverseScore && (
-                <Text style={styles.reverseNote}>
-                  Câu này được đảo điểm khi tính kết quả.
-                </Text>
-              )}
-
-              <View style={styles.optionsBox}>
-                {answerOptions.map((option) => {
-                  const selected = answers[question.id] === option.value;
-
-                  return (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={styles.optionRow}
-                      onPress={() => selectAnswer(question.id, option.value)}
-                      activeOpacity={0.8}
-                    >
-                      <View
-                        style={[
-                          styles.radio,
-                          selected && styles.radioSelected,
-                        ]}
-                      >
-                        {selected && <View style={styles.radioDot} />}
-                      </View>
-
-                      <Text
-                        style={[
-                          styles.optionText,
-                          selected && styles.optionTextSelected,
-                        ]}
-                      >
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          ))}
-
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              totalAnswered !== questions.length && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={submitting}
-            activeOpacity={0.85}
-          >
-            {submitting ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.submitText}>
-                Submit Result ({totalAnswered}/{questions.length})
+            <View style={styles.topTitleWrap}>
+              <Text style={styles.title}>{title || "Emotional Assessment"}</Text>
+              <Text style={styles.subtitle}>
+                {totalAnswered}/{questions.length} câu đã trả lời
               </Text>
-            )}
-          </TouchableOpacity>
+            </View>
+
+            <View style={styles.progressPill}>
+              <Text style={styles.progressPillText}>{Math.round(progress * 100)}%</Text>
+            </View>
+          </View>
+
+          <View style={[styles.assessmentGrid, !isWebDesktop && styles.assessmentGridMobile]}>
+            <View style={styles.sidebar}>
+              <Text style={styles.heroIcon}>{testType === "WHO5" ? "🧘‍♀️" : "📘"}</Text>
+              <Text style={styles.infoTitle}>Hướng dẫn</Text>
+              <Text style={styles.infoText}>{description}</Text>
+              <Text style={styles.sourceText}>{source}</Text>
+              <Text style={styles.disclaimer}>{disclaimer}</Text>
+
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
+              </View>
+            </View>
+
+            <View style={styles.questionList}>
+              {questions.map((question, index) => (
+                <View key={question.id} style={styles.questionCard}>
+                  <View style={styles.questionHeader}>
+                    <View style={styles.numberBox}>
+                      <Text style={styles.numberText}>{index + 1}</Text>
+                    </View>
+
+                    <Text style={styles.questionText}>{question.text}</Text>
+                  </View>
+
+                  {question.reverseScore ? (
+                    <Text style={styles.reverseNote}>
+                      Câu này được đảo điểm khi tính kết quả.
+                    </Text>
+                  ) : null}
+
+                  <View style={styles.optionsBox}>
+                    {answerOptions.map((option) => {
+                      const selected = answers[question.id] === option.value;
+
+                      return (
+                        <TouchableOpacity
+                          key={option.value}
+                          style={[styles.optionRow, selected && styles.optionRowSelected]}
+                          onPress={() => selectAnswer(question.id, option.value)}
+                          activeOpacity={0.86}
+                        >
+                          <View style={[styles.radio, selected && styles.radioSelected]}>
+                            {selected ? <View style={styles.radioDot} /> : null}
+                          </View>
+
+                          <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
+                            {option.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  totalAnswered !== questions.length && styles.submitButtonDisabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={submitting}
+                activeOpacity={0.85}
+              >
+                {submitting ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitText}>
+                    Xem kết quả ({totalAnswered}/{questions.length})
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
 
           <View style={{ height: 70 }} />
         </ScrollView>
@@ -236,13 +233,25 @@ export default function EmotionalAssessmentScreen({ navigation }: Props) {
   );
 }
 
+const softShadow = Platform.select({
+  web: { boxShadow: "0 18px 48px rgba(15, 23, 42, 0.07)" },
+  ios: { shadowColor: "#7C3AED", shadowOpacity: 0.09, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } },
+  android: { elevation: 3 },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   safe: {
     flex: 1,
-    paddingHorizontal: 22,
+  },
+  scrollContent: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === "web" ? 28 : 12,
   },
   loadingBox: {
     flex: 1,
@@ -252,178 +261,222 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     color: "#4B4774",
-    fontWeight: "700",
+    fontWeight: "800",
   },
   topBar: {
-    marginTop: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 14,
+    marginBottom: 22,
   },
   backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#EDE9FE",
   },
   backText: {
     fontSize: 34,
-    lineHeight: 34,
-    color: "#6F62D8",
+    lineHeight: 36,
+    color: "#7C3AED",
+    fontWeight: "900",
+  },
+  topTitleWrap: {
+    flex: 1,
   },
   title: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 17,
+    color: "#1E1538",
+    fontSize: Platform.OS === "web" ? 28 : 20,
     fontWeight: "900",
-    color: "#121027",
   },
-  heroBox: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 130,
+  subtitle: {
+    marginTop: 3,
+    color: "#6B7280",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  progressPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+    backgroundColor: "#EDE9FE",
+  },
+  progressPillText: {
+    color: "#7C3AED",
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  assessmentGrid: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 22,
+  },
+  assessmentGridMobile: {
+    flexDirection: "column",
+  },
+  sidebar: {
+    width: Platform.OS === "web" ? 330 : "100%",
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    padding: 24,
+    ...softShadow,
+    ...Platform.select({
+      web: {
+        position: "sticky" as any,
+        top: 18,
+      },
+    }),
   },
   heroIcon: {
-    fontSize: 82,
-  },
-  infoCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 26,
-    padding: 20,
+    fontSize: 70,
     marginBottom: 14,
   },
-  infoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  infoIconCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#B891F6",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  infoIcon: {
-    color: "#FFFFFF",
-    fontWeight: "900",
-  },
   infoTitle: {
-    fontSize: 12,
-    fontWeight: "900",
     color: "#1D1B38",
+    fontSize: 18,
+    fontWeight: "900",
   },
   infoText: {
-    fontSize: 12,
-    color: "#34304F",
-    lineHeight: 19,
+    marginTop: 10,
+    color: "#4B5563",
+    fontSize: 14,
+    lineHeight: 22,
   },
   sourceText: {
-    marginTop: 10,
-    fontSize: 11,
-    color: "#6F62D8",
-    fontWeight: "800",
+    marginTop: 14,
+    color: "#7C3AED",
+    fontSize: 12,
+    fontWeight: "900",
   },
   disclaimer: {
     marginTop: 12,
-    fontSize: 11,
-    color: "#8A85A8",
-    lineHeight: 17,
+    color: "#6B7280",
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  progressTrack: {
+    marginTop: 22,
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#EDE9FE",
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#7C3AED",
+  },
+  questionList: {
+    flex: 1,
+    width: "100%",
   },
   questionCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 16,
-    marginBottom: 14,
+    borderRadius: 28,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    ...softShadow,
   },
   questionHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 12,
+    gap: 12,
+    marginBottom: 14,
   },
   numberBox: {
-    width: 24,
-    height: 24,
-    borderRadius: 7,
-    backgroundColor: "#FFC7DE",
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    backgroundColor: "#7C3AED",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-  },
-  numberBoxBlue: {
-    backgroundColor: "#CAD8FF",
-  },
-  numberBoxOrange: {
-    backgroundColor: "#FFE0B5",
   },
   numberText: {
     color: "#FFFFFF",
     fontWeight: "900",
-    fontSize: 12,
+    fontSize: 13,
   },
   questionText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "900",
     color: "#1D1B38",
-    lineHeight: 18,
+    lineHeight: 23,
   },
   reverseNote: {
-    marginBottom: 10,
-    fontSize: 11,
-    color: "#9B7DF5",
-    fontWeight: "700",
+    marginBottom: 12,
+    fontSize: 12,
+    color: "#7C3AED",
+    fontWeight: "800",
   },
   optionsBox: {
-    marginTop: 4,
+    gap: 10,
   },
   optionRow: {
+    minHeight: 46,
+    borderRadius: 18,
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 9,
+    paddingHorizontal: 14,
+  },
+  optionRowSelected: {
+    backgroundColor: "#F5F3FF",
+    borderColor: "#7C3AED",
   },
   radio: {
-    width: 11,
-    height: 11,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "#F1CFE0",
-    marginRight: 9,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: "#C4B5FD",
+    marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   radioSelected: {
-    borderColor: "#B891F6",
+    borderColor: "#7C3AED",
   },
   radioDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#B891F6",
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#7C3AED",
   },
   optionText: {
-    fontSize: 12,
-    color: "#36314E",
+    fontSize: 14,
+    color: "#374151",
     flex: 1,
+    lineHeight: 20,
   },
   optionTextSelected: {
-    color: "#6F62D8",
-    fontWeight: "800",
+    color: "#5B21B6",
+    fontWeight: "900",
   },
   submitButton: {
     marginTop: 8,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: "#9B7DF5",
+    height: 56,
+    borderRadius: 999,
+    backgroundColor: "#7C3AED",
     justifyContent: "center",
     alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0 14px 32px rgba(124, 58, 237, 0.28)" },
+      android: { elevation: 4 },
+    }),
   },
   submitButtonDisabled: {
-    backgroundColor: "#C7BAEF",
+    backgroundColor: "#C4B5FD",
   },
   submitText: {
     color: "#FFFFFF",

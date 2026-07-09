@@ -16,6 +16,11 @@ export const forumStyles = StyleSheet.create({
   page: {
     flex: 1,
     backgroundColor: colors.bg,
+    ...Platform.select({
+      web: {
+        backgroundColor: "#FAFAFC",
+      },
+    }),
   },
 
   // ── Header ────────────────────────────────────────────────────────────────
@@ -28,6 +33,19 @@ export const forumStyles = StyleSheet.create({
     borderBottomRightRadius: 30,
     borderBottomWidth: 1,
     borderColor: colors.borderPrimary,
+    ...Platform.select({
+      web: {
+        maxWidth: 1120,
+        width: "100%",
+        alignSelf: "center",
+        marginTop: 22,
+        paddingTop: 26,
+        paddingHorizontal: 30,
+        paddingBottom: 24,
+        borderRadius: 32,
+        boxShadow: "0 18px 48px rgba(124, 58, 237, 0.12)",
+      },
+    }),
   },
 
   backButton: {
@@ -166,6 +184,15 @@ export const forumStyles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 16,
     paddingBottom: 130,
+    ...Platform.select({
+      web: {
+        maxWidth: 860,
+        width: "100%",
+        alignSelf: "center",
+        paddingHorizontal: 0,
+        paddingTop: 24,
+      },
+    }),
   },
 
   // ── Post Card ─────────────────────────────────────────────────────────────
@@ -177,6 +204,15 @@ export const forumStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     ...cardShadow,
+    ...Platform.select({
+      web: {
+        borderRadius: 28,
+        padding: 20,
+        marginBottom: 18,
+        borderColor: "#F1F5F9",
+        boxShadow: "0 18px 48px rgba(15, 23, 42, 0.07)",
+      },
+    }),
   },
 
   postCardFlagged: {
@@ -939,6 +975,72 @@ export const forumStyles = StyleSheet.create({
     }),
   },
 
+  replyInputRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  replyInput: {
+    flex: 1,
+    minHeight: 42,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    paddingHorizontal: 14,
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontFamily: webFont,
+  },
+
+  replySend: {
+    minHeight: 42,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  replySendCancel: {
+    minHeight: 42,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  inlineCommentSend: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  crisisReviewBox: {
+    marginTop: 12,
+    borderRadius: 18,
+    backgroundColor: colors.errorBg,
+    borderWidth: 1,
+    borderColor: "#FCA5A5",
+    padding: 12,
+  },
+
+  crisisReviewText: {
+    color: colors.error,
+    fontSize: 13,
+    fontWeight: "700",
+    lineHeight: 19,
+    fontFamily: webFont,
+  },
+
   // ── Report Modal ──────────────────────────────────────────────────────────
   reportModal: {
     backgroundColor: colors.surface,
@@ -1055,5 +1157,128 @@ export const forumStyles = StyleSheet.create({
     color: colors.textPrimary,
     fontFamily: webFont,
     textAlignVertical: "top",
+  },
+
+  myReportList: {
+    marginTop: 16,
+    gap: 12,
+  },
+
+  myReportCard: {
+    borderRadius: 18,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+  },
+
+  myReportReason: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily: displayFont,
+  },
+
+  myReportMeta: {
+    marginTop: 5,
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: "600",
+    fontFamily: webFont,
+  },
+
+  myReportDescription: {
+    marginTop: 8,
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: webFont,
+  },
+
+  emptyReportText: {
+    marginTop: 18,
+    color: colors.textMuted,
+    textAlign: "center",
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: webFont,
+  },
+
+  confirmBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+
+  confirmBox: {
+    width: "100%",
+    maxWidth: 420,
+    borderRadius: 26,
+    backgroundColor: colors.surface,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...Platform.select({
+      web: { boxShadow: "0 24px 70px rgba(15, 23, 42, 0.18)" },
+      android: { elevation: 10 },
+    }),
+  },
+
+  confirmTitle: {
+    color: colors.textPrimary,
+    fontSize: 20,
+    fontWeight: "900",
+    fontFamily: displayFont,
+  },
+
+  confirmText: {
+    marginTop: 10,
+    color: colors.textSecondary,
+    fontSize: 14,
+    lineHeight: 21,
+    fontFamily: webFont,
+  },
+
+  confirmActions: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+  },
+
+  cancelButton: {
+    minHeight: 44,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  cancelButtonText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily: webFont,
+  },
+
+  deleteButton: {
+    minHeight: 44,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: colors.error,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  deleteButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily: webFont,
   },
 });

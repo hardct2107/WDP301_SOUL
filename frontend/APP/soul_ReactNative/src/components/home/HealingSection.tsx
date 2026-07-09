@@ -1,14 +1,15 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
-import { styles } from "@/styles/home.styles";
 import { router } from "expo-router";
+
+import { styles } from "@/styles/home.styles";
 
 const healingFeatures = [
   {
     id: "ai",
-    title: "AI Companion",
-    sub: "Tâm sự 24/7",
+    title: "SOUL AI",
+    sub: "Lắng nghe và phản hồi cảm xúc",
     icon: "robot-outline",
     gradient: ["#E0E7FF", "#C7D2FE"],
     iconColor: "#4F46E5",
@@ -17,7 +18,7 @@ const healingFeatures = [
   {
     id: "diary",
     title: "Nhật ký",
-    sub: "Theo dõi cảm xúc",
+    sub: "Mood, điểm cảm xúc và AI insight",
     icon: "notebook-outline",
     gradient: ["#FCE7F3", "#FBCFE8"],
     iconColor: "#DB2777",
@@ -26,7 +27,7 @@ const healingFeatures = [
   {
     id: "test",
     title: "Bài test",
-    sub: "Đánh giá tâm lý",
+    sub: "WHO-5 và PSS-10",
     icon: "clipboard-text-outline",
     gradient: ["#FEF3C7", "#FDE68A"],
     iconColor: "#D97706",
@@ -35,7 +36,7 @@ const healingFeatures = [
   {
     id: "events",
     title: "Sự kiện",
-    sub: "Kết nối cộng đồng",
+    sub: "Đăng ký, điểm danh, đánh giá",
     icon: "calendar-star",
     gradient: ["#CCFBF1", "#99F6E4"],
     iconColor: "#0D9488",
@@ -46,8 +47,10 @@ const healingFeatures = [
 export function HealingSection() {
   return (
     <View>
-      <Text style={styles.sectionTitle}>Bắt đầu chữa lành chỉ trong 4 bước</Text>
-      <Text style={styles.sectionSub}>Khám phá các công cụ hỗ trợ sức khỏe tinh thần dành riêng cho bạn.</Text>
+      <Text style={styles.sectionTitle}>Những công cụ chính trong SOUL</Text>
+      <Text style={styles.sectionSub}>
+        Các tính năng đang có trong dự án, tập trung vào tự quan sát cảm xúc và kết nối an toàn.
+      </Text>
 
       <View style={styles.healingGrid}>
         {healingFeatures.map((feat) => (

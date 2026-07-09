@@ -5,15 +5,16 @@ import { styles } from "@/styles/home.styles";
 export function CtaFooter() {
   return (
     <View>
-      {/* CTA Section */}
       <LinearGradient
         colors={["#7C3AED", "#A855F7"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.ctaSection}
       >
-        <Text style={styles.ctaTitle}>Bắt đầu hành trình{"\n"}chữa lành ngay hôm nay</Text>
-        <Text style={styles.ctaSub}>Đăng ký nhận cẩm nang chăm sóc sức khỏe tinh thần miễn phí mỗi tuần.</Text>
+        <Text style={styles.ctaTitle}>Bắt đầu chăm sóc{"\n"}cảm xúc theo cách nhẹ nhàng</Text>
+        <Text style={styles.ctaSub}>
+          Tạo tài khoản để dùng SOUL AI, nhật ký cảm xúc, bài test tự đánh giá, sự kiện và cộng đồng an toàn.
+        </Text>
 
         <View style={styles.ctaInputWrap}>
           <TextInput
@@ -22,23 +23,22 @@ export function CtaFooter() {
             style={styles.ctaInput}
           />
           <TouchableOpacity style={styles.ctaBtn}>
-            <Text style={styles.ctaBtnText}>Đăng ký</Text>
+            <Text style={styles.ctaBtnText}>Bắt đầu</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
 
-      {/* Footer Section */}
       <View style={styles.footerWrap}>
         <Text style={styles.footerLogo}>SOUL</Text>
-        
+
         <View style={styles.footerLinks}>
-          <TouchableOpacity><Text style={styles.footerLink}>Về chúng tôi</Text></TouchableOpacity>
-          <TouchableOpacity><Text style={styles.footerLink}>Điều khoản</Text></TouchableOpacity>
-          <TouchableOpacity><Text style={styles.footerLink}>Bảo mật</Text></TouchableOpacity>
-          <TouchableOpacity><Text style={styles.footerLink}>Liên hệ</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.footerLink}>SOUL AI</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.footerLink}>Nhật ký</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.footerLink}>Bài test</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.footerLink}>Cộng đồng</Text></TouchableOpacity>
         </View>
 
-        <Text style={styles.footerCopy}>© 2026 SOUL AI. All rights reserved.</Text>
+        <Text style={styles.footerCopy}>© 2026 SOUL. Nền tảng hỗ trợ sức khỏe tinh thần, không thay thế tư vấn y khoa.</Text>
       </View>
     </View>
   );

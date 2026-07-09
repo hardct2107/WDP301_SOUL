@@ -73,6 +73,17 @@ export const styles = StyleSheet.create({
     borderBottomColor: "rgba(124, 58, 237, 0.08)",
     position: "relative",
     zIndex: 999,
+    ...Platform.select({
+      web: {
+        height: 72,
+        paddingTop: 0,
+        paddingBottom: 0,
+        paddingHorizontal: 56,
+        backgroundColor: "rgba(255, 255, 255, 0.82)",
+        backdropFilter: "blur(18px)",
+      } as any,
+      default: {},
+    }),
   },
   logoText: {
     fontSize: 22,
@@ -85,6 +96,37 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
+  },
+  webHeaderNav: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(124, 58, 237, 0.04)",
+    padding: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(124, 58, 237, 0.08)",
+  },
+  webHeaderNavItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+  },
+  webHeaderNavItemActive: {
+    backgroundColor: "#FFFFFF",
+    ...Platform.select({
+      web: { boxShadow: "0 8px 20px rgba(124, 58, 237, 0.10)" },
+      default: {},
+    }),
+  },
+  webHeaderNavText: {
+    color: "#64748B",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily: webFont,
+  },
+  webHeaderNavTextActive: {
+    color: colors.primary,
   },
   bellWrap: {
     width: 40,

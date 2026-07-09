@@ -5,29 +5,31 @@ import { styles } from "@/styles/home.styles";
 const testimonials = [
   {
     id: 1,
-    name: "Hải Yến",
-    role: "Sinh viên",
-    feedback: "Từ ngày dùng SOUL, mình học được cách làm bạn với cảm xúc của chính mình. Ứng dụng như một góc nhỏ bình yên mỗi tối.",
+    name: "Người dùng SOUL",
+    role: "Nhật ký cảm xúc",
+    feedback: "Tôi có thể ghi lại mood, điểm cảm xúc và xem lại các ghi chú của mình theo thời gian.",
   },
   {
     id: 2,
-    name: "Minh Khoa",
-    role: "Nhân viên văn phòng",
-    feedback: "Tính năng trò chuyện với AI thực sự ấn tượng, đôi khi chỉ cần một người lắng nghe không phán xét là đủ để thấy nhẹ nhõm.",
+    name: "Thành viên cộng đồng",
+    role: "Forum ẩn danh",
+    feedback: "Tôi có thể chia sẻ ẩn danh, nhận reaction hỗ trợ và report nội dung chưa phù hợp.",
   },
   {
     id: 3,
-    name: "Lan Anh",
-    role: "Freelancer",
-    feedback: "Bài test tâm lý rất chuẩn, giúp mình nhận ra bản thân đang quá tải để kịp thời điều chỉnh lại công việc.",
+    name: "Người tham gia sự kiện",
+    role: "Rating sau điểm danh",
+    feedback: "Sau khi được xác nhận tham dự, tôi có thể gửi đánh giá sao và bình luận cho sự kiện.",
   },
 ];
 
 export function Testimonials() {
   return (
     <View>
-      <Text style={[styles.sectionTitle, { marginTop: 16 }]}>Hàng ngàn người đã thay đổi</Text>
-      <Text style={styles.sectionSub}>Cùng lắng nghe chia sẻ từ cộng đồng SOUL</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 16 }]}>Các trải nghiệm chính trong SOUL</Text>
+      <Text style={styles.sectionSub}>
+        Nội dung minh họa dựa trên chức năng thật của dự án, không phải số liệu tác động lâm sàng.
+      </Text>
 
       <ScrollView
         horizontal
@@ -41,8 +43,8 @@ export function Testimonials() {
                 <MaterialCommunityIcons key={i} name="star" size={16} color="#F59E0B" />
               ))}
             </View>
-            <Text style={styles.testiText}>"{t.feedback}"</Text>
-            
+            <Text style={styles.testiText}>{t.feedback}</Text>
+
             <View style={styles.testiUserRow}>
               <View style={styles.testiAvatar}>
                 <MaterialCommunityIcons name="account" size={24} color="#94A3B8" style={{ alignSelf: "center", marginTop: 8 }} />

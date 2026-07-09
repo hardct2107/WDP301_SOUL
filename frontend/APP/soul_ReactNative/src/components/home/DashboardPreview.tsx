@@ -1,7 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View, TouchableOpacity } from "react-native";
-import { styles } from "@/styles/home.styles";
 import { router } from "expo-router";
+
+import { styles } from "@/styles/home.styles";
 
 const weekData = [
   { day: "Mon", height: 40, emoji: "😐" },
@@ -17,7 +18,7 @@ export function DashboardPreview() {
   return (
     <View style={styles.dashCard}>
       <View style={styles.dashHeader}>
-        <Text style={styles.dashTitle}>Mood Tracking</Text>
+        <Text style={styles.dashTitle}>Theo dõi cảm xúc</Text>
         <TouchableOpacity onPress={() => router.push("/diary")}>
           <Text style={styles.dashLink}>Xem chi tiết</Text>
         </TouchableOpacity>
@@ -36,7 +37,7 @@ export function DashboardPreview() {
       <View style={styles.insightBox}>
         <MaterialCommunityIcons name="lightbulb-on-outline" size={24} color="#F59E0B" />
         <Text style={styles.insightText}>
-          Tuần này bạn có xu hướng vui vẻ hơn vào cuối tuần. Hãy duy trì thói quen viết nhật ký nhé!
+          Dữ liệu minh họa: SOUL giúp bạn nhìn lại mood score và ghi chú cảm xúc qua nhật ký cá nhân.
         </Text>
       </View>
     </View>

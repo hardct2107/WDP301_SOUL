@@ -3,11 +3,13 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -68,6 +70,8 @@ const formatDateTime = (value: string) =>
   });
 
 export default function UserEventListScreen() {
+  const { width } = useWindowDimensions();
+  const desktop = Platform.OS === "web" && width >= 980;
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [registrationMap, setRegistrationMap] = useState<EventRegistrationMap>({});
   const [filter, setFilter] = useState<EventFilter>("all");
@@ -280,12 +284,15 @@ export default function UserEventListScreen() {
 
       <FlatList
         data={filteredEvents}
+        key={desktop ? "desktop-events" : "mobile-events"}
+        numColumns={desktop ? 2 : 1}
+        columnWrapperStyle={desktop ? screenStyles.webColumnWrapper : undefined}
         keyExtractor={(item) => item._id}
         renderItem={renderEvent}
         refreshing={loading}
         onRefresh={fetchEvents}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={screenStyles.listContent}
+        contentContainerStyle={[screenStyles.listContent, desktop && screenStyles.webListContent]}
         ListHeaderComponent={
           <View>
             <View style={screenStyles.heroCard}>
@@ -446,13 +453,33 @@ const screenStyles = StyleSheet.create({
     padding: 16,
     paddingBottom: 36,
   },
+  webListContent: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
+    paddingHorizontal: 28,
+    paddingTop: 22,
+    paddingBottom: 64,
+  },
+  webColumnWrapper: {
+    gap: 18,
+  },
   heroCard: {
     minHeight: 210,
-    borderRadius: 24,
-    padding: 22,
-    marginBottom: 14,
-    backgroundColor: "#006B5C",
+    borderRadius: 30,
+    padding: 26,
+    marginBottom: 18,
+    backgroundColor: "#7C3AED",
     justifyContent: "space-between",
+    overflow: "hidden",
+    ...Platform.select({
+      web: {
+        minHeight: 260,
+        padding: 34,
+        boxShadow: "0 24px 60px rgba(124, 58, 237, 0.16)",
+      },
+      default: {},
+    }),
   },
   heroBadge: {
     alignSelf: "flex-start",
@@ -503,9 +530,9 @@ const screenStyles = StyleSheet.create({
   searchBox: {
     minHeight: 46,
     backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#D9FBEF",
+    borderColor: "#EDE9FE",
     paddingHorizontal: 12,
     marginBottom: 12,
     flexDirection: "row",
@@ -531,7 +558,7 @@ const screenStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 999,
-    backgroundColor: "#DFF7EF",
+    backgroundColor: "#F5F3FF",
     borderWidth: 1,
     borderColor: "transparent",
   },
@@ -549,11 +576,19 @@ const screenStyles = StyleSheet.create({
   },
   eventCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 24,
+    padding: 18,
+    marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#E5F3EF",
+    borderColor: "#F1F5F9",
+    ...Platform.select({
+      web: {
+        flex: 1,
+        minHeight: 310,
+        boxShadow: "0 14px 34px rgba(15, 23, 42, 0.05)",
+      },
+      default: {},
+    }),
   },
   cardTop: {
     flexDirection: "row",
@@ -566,7 +601,7 @@ const screenStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 15,
-    backgroundColor: "#FFF1E2",
+    backgroundColor: "#F3E8FF",
   },
   cardTitleWrap: {
     flex: 1,
@@ -586,7 +621,7 @@ const screenStyles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     fontWeight: "800",
-    color: "#FF7A00",
+    color: colors.primary,
   },
   statusPill: {
     paddingHorizontal: 9,
@@ -626,7 +661,7 @@ const screenStyles = StyleSheet.create({
   progressTrack: {
     height: 8,
     borderRadius: 999,
-    backgroundColor: "#DFF7EF",
+    backgroundColor: "#EDE9FE",
     overflow: "hidden",
   },
   progressFill: {

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   GestureResponderEvent,
+  Platform,
 } from "react-native";
 
 type Props = {
@@ -59,10 +60,21 @@ const styles = StyleSheet.create({
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
     shadowColor: "#9B8AFB",
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 2,
+    ...Platform.select({
+      web: {
+        minHeight: 136,
+        marginBottom: 0,
+        padding: 18,
+        borderRadius: 26,
+        boxShadow: "0 14px 36px rgba(15, 23, 42, 0.06)",
+      },
+    }),
   },
   disabledCard: {
     opacity: 0.65,
@@ -71,10 +83,18 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 18,
-    backgroundColor: "#EAF3FF",
+    backgroundColor: "#F3E8FF",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
+    ...Platform.select({
+      web: {
+        width: 64,
+        height: 64,
+        borderRadius: 20,
+        marginRight: 16,
+      },
+    }),
   },
   icon: {
     fontSize: 28,
@@ -87,11 +107,23 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1D1B38",
     marginBottom: 6,
+    ...Platform.select({
+      web: {
+        fontSize: 16,
+        fontWeight: "900",
+      },
+    }),
   },
   description: {
     fontSize: 11,
     color: "#7D7A9E",
     lineHeight: 15,
+    ...Platform.select({
+      web: {
+        fontSize: 13,
+        lineHeight: 19,
+      },
+    }),
   },
   right: {
     alignItems: "flex-end",
@@ -103,7 +135,7 @@ const styles = StyleSheet.create({
     color: "#7D7A9E",
   },
   startButton: {
-    backgroundColor: "#B891F6",
+    backgroundColor: "#7C3AED",
     paddingHorizontal: 16,
     paddingVertical: 7,
     borderRadius: 18,
