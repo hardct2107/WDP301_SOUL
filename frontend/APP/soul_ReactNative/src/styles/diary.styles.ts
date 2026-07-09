@@ -16,6 +16,13 @@ export const diaryStyles = StyleSheet.create({
   page: {
     flex: 1,
     backgroundColor: colors.bg,
+    ...Platform.select({
+      web: {
+        backgroundColor: "#FAFAFC",
+        paddingHorizontal: 28,
+        paddingTop: 22,
+      },
+    }),
   },
 
   // ── Header ────────────────────────────────────────────────────────────────
@@ -28,6 +35,19 @@ export const diaryStyles = StyleSheet.create({
     borderBottomRightRadius: 32,
     borderBottomWidth: 1,
     borderColor: colors.borderPrimary,
+    ...Platform.select({
+      web: {
+        width: "100%",
+        maxWidth: 1180,
+        alignSelf: "center",
+        paddingTop: 26,
+        paddingHorizontal: 34,
+        paddingBottom: 24,
+        borderRadius: 34,
+        overflow: "hidden",
+        boxShadow: "0 24px 70px rgba(124, 58, 237, 0.16)",
+      },
+    }),
   },
 
   headerTop: {
@@ -68,6 +88,13 @@ export const diaryStyles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "800",
     fontFamily: displayFont,
+    ...Platform.select({
+      web: {
+        marginTop: 22,
+        fontSize: 44,
+        letterSpacing: -1.2,
+      },
+    }),
   },
 
   subtitle: {
@@ -76,6 +103,13 @@ export const diaryStyles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     fontFamily: webFont,
+    ...Platform.select({
+      web: {
+        maxWidth: 560,
+        fontSize: 16,
+        lineHeight: 25,
+      },
+    }),
   },
 
   // ── Today Card (header section) ───────────────────────────────────────────
@@ -93,7 +127,12 @@ export const diaryStyles = StyleSheet.create({
     ...Platform.select({
       ios: { shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
       android: { elevation: 3 },
-      web: { boxShadow: "0 4px 16px rgba(124, 58, 237, 0.08)" },
+      web: {
+        maxWidth: 520,
+        minHeight: 112,
+        padding: 22,
+        boxShadow: "0 14px 36px rgba(49, 46, 129, 0.12)",
+      },
       default: { elevation: 3 },
     }),
   },
@@ -122,6 +161,12 @@ export const diaryStyles = StyleSheet.create({
   filterRow: {
     paddingTop: 16,
     gap: 10,
+    ...Platform.select({
+      web: {
+        paddingTop: 22,
+        paddingBottom: 2,
+      },
+    }),
   },
 
   filterChip: {
@@ -156,6 +201,19 @@ export const diaryStyles = StyleSheet.create({
     paddingBottom: 40,
   },
 
+  webList: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
+    paddingHorizontal: 0,
+    paddingTop: 24,
+    paddingBottom: 72,
+  },
+
+  webColumnWrapper: {
+    gap: 18,
+  },
+
   // ── Diary Card ────────────────────────────────────────────────────────────
   diaryCard: {
     backgroundColor: colors.surface,
@@ -165,6 +223,17 @@ export const diaryStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     ...cardShadow,
+    ...Platform.select({
+      web: {
+        flex: 1,
+        minHeight: 280,
+        marginBottom: 18,
+        borderRadius: 28,
+        padding: 20,
+        borderColor: "#F1F5F9",
+        boxShadow: "0 18px 48px rgba(15, 23, 42, 0.07)",
+      },
+    }),
   },
 
   diaryTop: {
@@ -308,6 +377,13 @@ export const diaryStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderPrimary,
     padding: 13,
+    ...Platform.select({
+      web: {
+        marginTop: 16,
+        borderRadius: 20,
+        padding: 15,
+      },
+    }),
   },
 
   aiInsightMedium: {
@@ -401,6 +477,17 @@ export const diaryStyles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 80,
     paddingHorizontal: 24,
+    ...Platform.select({
+      web: {
+        minHeight: 360,
+        justifyContent: "center",
+        backgroundColor: "#FFFFFF",
+        borderRadius: 28,
+        borderWidth: 1,
+        borderColor: "#F1F5F9",
+        boxShadow: "0 18px 48px rgba(15, 23, 42, 0.06)",
+      },
+    }),
   },
 
   emptyIcon: {

@@ -15,6 +15,7 @@ import {
   Switch,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -106,6 +107,9 @@ function getSentimentText(sentiment?: string | null) {
 }
 
 export default function DiaryScreen() {
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
+
   const [token, setToken] = useState<string | null>(null);
 
   const [diaries, setDiaries] = useState<any[]>([]);
@@ -498,10 +502,13 @@ export default function DiaryScreen() {
       </LinearGradient>
 
       <FlatList
+        key={isWebDesktop ? "diary-web-grid" : "diary-list"}
         data={visibleDiaries}
         keyExtractor={(item) => item._id}
         renderItem={renderDiary}
-        contentContainerStyle={s.list}
+        numColumns={isWebDesktop ? 2 : 1}
+        columnWrapperStyle={isWebDesktop ? s.webColumnWrapper : undefined}
+        contentContainerStyle={[s.list, isWebDesktop && s.webList]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

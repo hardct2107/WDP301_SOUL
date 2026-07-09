@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -11,7 +11,6 @@ import {
   Modal,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   getNotifications,
   markAllRead,
@@ -26,8 +25,11 @@ const webFont = Platform.select({
 
 // ─── Inject web animation CSS ────────────────────────────────────────────────
 if (Platform.OS === "web" && typeof document !== "undefined") {
-  const s = document.createElement("style");
-  s.innerHTML = `
+  const styleId = "soul-notification-dropdown-styles";
+  if (!document.getElementById(styleId)) {
+    const s = document.createElement("style");
+    s.id = styleId;
+    s.innerHTML = `
     @keyframes notif-slide-in {
       from { opacity:0; transform: translateY(-8px) scale(0.97); }
       to   { opacity:1; transform: translateY(0)   scale(1); }
@@ -36,7 +38,8 @@ if (Platform.OS === "web" && typeof document !== "undefined") {
     .notif-item:hover { background: #F5F3FF !important; }
     .notif-item { transition: background 0.12s ease; }
   `;
-  document.head.appendChild(s);
+    document.head.appendChild(s);
+  }
 }
 
 // ─── Icon map theo type ───────────────────────────────────────────────────────

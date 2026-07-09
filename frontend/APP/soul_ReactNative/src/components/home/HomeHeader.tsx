@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { router } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   Image,
   Pressable,
@@ -7,12 +8,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { router } from "expo-router";
+import { getUnreadCount } from "@/api/notificationApi";
 import { useAuthStore } from "@/store";
 import { styles } from "@/styles/home.styles";
-import { ProfileModals } from "./ProfileModals";
 import { NotificationDropdown } from "./NotificationDropdown";
-import { getUnreadCount } from "@/api/notificationApi";
+import { ProfileModals } from "./ProfileModals";
 
 type Props = {
   showSidebar: boolean;
@@ -20,24 +20,30 @@ type Props = {
   webMode?: boolean;
 };
 
-const POLL_INTERVAL = 30_000; // 30 giây
+const POLL_INTERVAL = 30_000;
+
+const webNavItems = [
+  { label: "SOUL AI", route: "/ai-chat" },
+  { label: "Nhật ký", route: "/diary" },
+  { label: "Bài test", route: "/emotional-test" },
+  { label: "Sự kiện", route: "/user-events" },
+  { label: "Cộng đồng", route: "/(tabs)/forum" },
+];
 
 export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Props) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { user, logout } = useAuthStore();
-
   const [showMyProfile, setShowMyProfile] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const { user, logout } = useAuthStore();
 
-  // ── Fetch unread count ──────────────────────────────────────────────────
   const fetchUnread = useCallback(async () => {
     try {
       const count = await getUnreadCount();
       setUnreadCount(count);
     } catch {
-      /* silent */
+      // Notification count is non-blocking for the home experience.
     }
   }, []);
 
@@ -47,7 +53,6 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
     return () => clearInterval(interval);
   }, [fetchUnread]);
 
-  // Khi đóng dropdown → cập nhật lại số unread
   const handleCloseNotifications = () => {
     setShowNotifications(false);
     fetchUnread();
@@ -67,7 +72,6 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
 
   return (
     <View style={styles.header}>
-      {/* Left side: Hamburger (if not web) + Logo */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         {!webMode && (
           <TouchableOpacity onPress={onToggleSidebar} activeOpacity={0.8}>
@@ -81,9 +85,32 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
         <Text style={styles.logoText}>SOUL</Text>
       </View>
 
-      {/* Right side: Notification & Avatar */}
+      {webMode && (
+        <View style={styles.webHeaderNav}>
+          {webNavItems.map((item, index) => (
+            <TouchableOpacity
+              key={item.label}
+              activeOpacity={0.78}
+              onPress={() => router.push(item.route as any)}
+              style={[
+                styles.webHeaderNavItem,
+                index === 0 && styles.webHeaderNavItemActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.webHeaderNavText,
+                  index === 0 && styles.webHeaderNavTextActive,
+                ]}
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
       <View style={styles.headerRight}>
-        {/* Bell */}
         <TouchableOpacity
           style={styles.bellWrap}
           onPress={() => setShowNotifications(!showNotifications)}
@@ -120,7 +147,7 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
                   style={styles.profileImg}
                 />
                 <View>
-                  <Text style={styles.profileName}>{user?.fullName || "Vy Nguyễn"}</Text>
+                  <Text style={styles.profileName}>{user?.fullName || "SOUL user"}</Text>
                   <Text style={styles.profileSub}>
                     {user?.bio || "Take care of your mind 🌱"}
                   </Text>
@@ -130,7 +157,7 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
               {[
                 ["account-outline", "My Profile"],
                 ["pencil-outline", "Edit Profile"],
-                ["trophy-outline", "Achievements"],
+                ["star-outline", "App Rating"],
                 ["bell-outline", "Reminders"],
                 ["logout", "Log out"],
               ].map(([icon, text], index) => (
@@ -155,7 +182,6 @@ export function HomeHeader({ showSidebar, onToggleSidebar, webMode = false }: Pr
         </Pressable>
       </View>
 
-      {/* Notification dropdown / sheet */}
       <NotificationDropdown
         visible={showNotifications}
         onClose={handleCloseNotifications}

@@ -1,14 +1,17 @@
 import React, { useMemo } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
+  Platform,
   SafeAreaView,
-  TouchableOpacity,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
+
 import { EmotionalTestResult } from "../../api/emotionalTestApi";
 
 function getEmoji(result?: EmotionalTestResult) {
@@ -68,7 +71,6 @@ function parseResultParam(resultParam: string | string[] | undefined) {
     if (!resultParam) return undefined;
 
     const value = Array.isArray(resultParam) ? resultParam[0] : resultParam;
-
     if (!value) return undefined;
 
     return JSON.parse(value) as EmotionalTestResult;
@@ -80,80 +82,93 @@ function parseResultParam(resultParam: string | string[] | undefined) {
 
 export default function EmotionalResultScreen() {
   const params = useLocalSearchParams();
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
 
   const result = useMemo(() => {
     return parseResultParam(params.result);
   }, [params.result]);
 
   return (
-    <LinearGradient colors={["#BFD7FF", "#D9C2FF"]} style={styles.container}>
+    <LinearGradient colors={["#F8F5FF", "#FFFFFF", "#F0FDFA"]} style={styles.container}>
       <SafeAreaView style={styles.safe}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <View style={styles.topBar}>
             <TouchableOpacity
               style={styles.backButton}
-        onPress={() => router.replace("/(tabs)" as any)}
+              onPress={() => router.replace("/emotional-test" as any)}
+              activeOpacity={0.85}
             >
               <Text style={styles.backText}>‹</Text>
             </TouchableOpacity>
 
-            <Text style={styles.title}>Your Result</Text>
-
-            <View style={{ width: 38 }} />
+            <View style={styles.titleWrap}>
+              <Text style={styles.title}>Kết quả bài test</Text>
+              <Text style={styles.subtitle}>Một góc nhìn nhẹ nhàng để bạn hiểu mình hơn.</Text>
+            </View>
           </View>
 
-          <View style={styles.resultCard}>
-            <Text style={styles.emoji}>{getEmoji(result)}</Text>
+          <View style={[styles.resultGrid, !isWebDesktop && styles.resultGridMobile]}>
+            <View style={styles.resultCard}>
+              <Text style={styles.emoji}>{getEmoji(result)}</Text>
 
-            <Text style={styles.testTitle}>
-              {result?.testTitle || "Emotional Check"}
-            </Text>
+              <Text style={styles.testTitle}>{result?.testTitle || "Emotional Check"}</Text>
+              <Text style={styles.score}>{getScoreLabel(result)}</Text>
+              <Text style={styles.levelLabel}>{result?.levelLabel || "Emotional well-being"}</Text>
+              <Text style={styles.message}>{getResultMessage(result)}</Text>
 
-            <Text style={styles.score}>{getScoreLabel(result)}</Text>
+              <View style={styles.scoreBar}>
+                <View style={styles.scoreBarFill} />
+              </View>
+            </View>
 
-            <Text style={styles.levelLabel}>
-              {result?.levelLabel || "Emotional well-being"}
-            </Text>
+            <View style={styles.sideStack}>
+              <View style={styles.suggestionCard}>
+                <Text style={styles.cardTitle}>Gợi ý cho bạn</Text>
+                <Text style={styles.cardText}>
+                  {result?.suggestion ||
+                    "Hãy dành một chút thời gian nghỉ ngơi, hít thở sâu hoặc viết nhật ký cảm xúc."}
+                </Text>
+              </View>
 
-            <Text style={styles.message}>{getResultMessage(result)}</Text>
+              <View style={styles.warningCard}>
+                <Text style={styles.warningTitle}>Lưu ý an toàn</Text>
+                <Text style={styles.warningText}>
+                  {result?.disclaimer ||
+                    "Kết quả này chỉ nhằm hỗ trợ bạn tự nhìn lại trạng thái cảm xúc, không phải chẩn đoán y khoa hoặc thay thế chuyên gia tâm lý."}
+                </Text>
+              </View>
+
+              <View style={styles.actionCard}>
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={() => router.push("/ai-chat" as any)}
+                  activeOpacity={0.88}
+                >
+                  <Text style={styles.primaryButtonText}>Trò chuyện với SOUL AI</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.secondaryButton}
+                  onPress={() => router.push("/diary" as any)}
+                  activeOpacity={0.88}
+                >
+                  <Text style={styles.secondaryButtonText}>Viết nhật ký cảm xúc</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.homeButton}
+                  onPress={() => router.push("/emotional-test" as any)}
+                  activeOpacity={0.88}
+                >
+                  <Text style={styles.homeButtonText}>Quay lại danh sách bài test</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.suggestionCard}>
-            <Text style={styles.cardTitle}>Gợi ý cho bạn</Text>
-            <Text style={styles.cardText}>
-              {result?.suggestion ||
-                "Hãy dành một chút thời gian nghỉ ngơi, hít thở sâu hoặc viết nhật ký cảm xúc."}
-            </Text>
-          </View>
-
-          <View style={styles.warningCard}>
-            <Text style={styles.warningTitle}>Lưu ý an toàn</Text>
-            <Text style={styles.warningText}>
-              {result?.disclaimer ||
-                "Kết quả này chỉ nhằm hỗ trợ bạn tự nhìn lại trạng thái cảm xúc, không phải chẩn đoán y khoa hoặc thay thế chuyên gia tâm lý."}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push("/ai-chat" as any)}
-          >
-            <Text style={styles.primaryButtonText}>Talk with SOUL AI</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push("/diary" as any)}
-          >
-            <Text style={styles.secondaryButtonText}>Write emotional diary</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => router.push("/emotional-test" as any)}
-          >
-            <Text style={styles.homeButtonText}>Back to Tests</Text>
-          </TouchableOpacity>
 
           <View style={{ height: 80 }} />
         </ScrollView>
@@ -162,144 +177,216 @@ export default function EmotionalResultScreen() {
   );
 }
 
+const softShadow = Platform.select({
+  web: { boxShadow: "0 18px 48px rgba(15, 23, 42, 0.07)" },
+  ios: { shadowColor: "#7C3AED", shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } },
+  android: { elevation: 3 },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   safe: {
     flex: 1,
-    paddingHorizontal: 22,
+  },
+  scrollContent: {
+    width: "100%",
+    maxWidth: 1120,
+    alignSelf: "center",
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === "web" ? 28 : 12,
   },
   topBar: {
-    marginTop: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 14,
+    marginBottom: 24,
   },
   backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#EDE9FE",
   },
   backText: {
     fontSize: 34,
-    lineHeight: 34,
-    color: "#6F62D8",
+    lineHeight: 36,
+    color: "#7C3AED",
+    fontWeight: "900",
+  },
+  titleWrap: {
+    flex: 1,
   },
   title: {
-    fontSize: 18,
+    color: "#1E1538",
+    fontSize: Platform.OS === "web" ? 32 : 22,
     fontWeight: "900",
-    color: "#121027",
+  },
+  subtitle: {
+    marginTop: 4,
+    color: "#6B7280",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  resultGrid: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 22,
+  },
+  resultGridMobile: {
+    flexDirection: "column",
   },
   resultCard: {
-    marginTop: 32,
+    flex: 1.2,
+    minHeight: 480,
     backgroundColor: "#FFFFFF",
-    borderRadius: 30,
-    padding: 28,
+    borderRadius: 34,
+    padding: 34,
     alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    ...softShadow,
   },
   emoji: {
-    fontSize: 72,
-    marginBottom: 8,
+    fontSize: 86,
+    marginBottom: 14,
   },
   testTitle: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: "900",
     color: "#1D1B38",
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   score: {
-    fontSize: 44,
+    fontSize: Platform.OS === "web" ? 64 : 48,
     fontWeight: "900",
-    color: "#6F62D8",
+    color: "#7C3AED",
+    letterSpacing: -1.5,
   },
   levelLabel: {
     marginTop: 6,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "900",
     color: "#1D1B38",
     textAlign: "center",
   },
   message: {
-    marginTop: 12,
-    fontSize: 13,
-    color: "#6F6A91",
+    marginTop: 14,
+    fontSize: 15,
+    color: "#6B7280",
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 23,
+    maxWidth: 520,
+  },
+  scoreBar: {
+    width: "100%",
+    maxWidth: 420,
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#EDE9FE",
+    marginTop: 28,
+    overflow: "hidden",
+  },
+  scoreBarFill: {
+    width: "68%",
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#7C3AED",
+  },
+  sideStack: {
+    width: Platform.OS === "web" ? 360 : "100%",
+    gap: 16,
   },
   suggestionCard: {
-    marginTop: 18,
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: 28,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    ...softShadow,
   },
   warningCard: {
-    marginTop: 14,
-    backgroundColor: "rgba(255,255,255,0.65)",
-    borderRadius: 24,
-    padding: 20,
+    backgroundColor: "#FFFBEB",
+    borderRadius: 28,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+  },
+  actionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    ...softShadow,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "900",
     color: "#1D1B38",
     marginBottom: 10,
   },
   cardText: {
-    fontSize: 13,
-    color: "#5C577C",
-    lineHeight: 20,
+    fontSize: 14,
+    color: "#4B5563",
+    lineHeight: 22,
   },
   warningTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "900",
-    color: "#1D1B38",
+    color: "#92400E",
     marginBottom: 10,
   },
   warningText: {
-    fontSize: 12,
-    color: "#6F6A91",
-    lineHeight: 19,
+    fontSize: 13,
+    color: "#78350F",
+    lineHeight: 20,
   },
   primaryButton: {
-    marginTop: 22,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: "#9B7DF5",
+    height: 52,
+    borderRadius: 999,
+    backgroundColor: "#7C3AED",
     justifyContent: "center",
     alignItems: "center",
+    ...Platform.select({
+      web: { boxShadow: "0 14px 30px rgba(124, 58, 237, 0.28)" },
+      android: { elevation: 4 },
+    }),
   },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "900",
   },
   secondaryButton: {
     marginTop: 12,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: "#FFFFFF",
+    height: 52,
+    borderRadius: 999,
+    backgroundColor: "#F5F3FF",
     justifyContent: "center",
     alignItems: "center",
   },
   secondaryButtonText: {
-    color: "#7B61FF",
-    fontSize: 15,
+    color: "#7C3AED",
+    fontSize: 14,
     fontWeight: "900",
   },
   homeButton: {
-    marginTop: 12,
-    height: 48,
+    marginTop: 10,
+    height: 46,
     justifyContent: "center",
     alignItems: "center",
   },
   homeButtonText: {
-    color: "#4F4A73",
-    fontSize: 14,
+    color: "#4B5563",
+    fontSize: 13,
     fontWeight: "800",
   },
 });

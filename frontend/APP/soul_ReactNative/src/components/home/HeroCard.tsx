@@ -1,5 +1,4 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "@/styles/home.styles";
 
@@ -17,16 +16,17 @@ export function HeroCard({ onStartChat }: Props) {
         style={styles.heroCard}
       >
         <View style={styles.heroBadge}>
-          <Text style={styles.heroBadgeText}>✨ AI đồng hành sức khỏe tinh thần 24/7</Text>
+          <Text style={styles.heroBadgeText}>SOUL AI đồng hành cảm xúc bằng tiếng Việt</Text>
         </View>
 
         <Text style={styles.heroTitle}>
-          Tâm trí bình an —{"\n"}
+          Tâm trí bình an{"\n"}
           <Text style={{ color: "#D946EF" }}>bắt đầu từ một cuộc trò chuyện</Text>
         </Text>
 
         <Text style={styles.heroDescription}>
-          SOUL là người bạn AI lắng nghe, thấu hiểu và đồng hành cùng bạn trên hành trình chăm sóc sức khỏe tinh thần mỗi ngày.
+          SOUL hỗ trợ bạn lắng nghe cảm xúc, viết nhật ký, làm bài test tự đánh giá,
+          tham gia sự kiện wellness và kết nối trong cộng đồng an toàn.
         </Text>
 
         <View style={styles.heroButtons}>
@@ -37,7 +37,7 @@ export function HeroCard({ onStartChat }: Props) {
               end={{ x: 1, y: 0 }}
               style={styles.heroButtonPrimary}
             >
-              <Text style={styles.heroButtonPrimaryText}>Bắt đầu trò chuyện</Text>
+              <Text style={styles.heroButtonPrimaryText}>Bắt đầu miễn phí</Text>
             </LinearGradient>
           </TouchableOpacity>
 
